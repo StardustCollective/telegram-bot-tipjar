@@ -2,6 +2,7 @@
   "name": "telegram-bot-tipjar",
   "description": "Cloud Functions for Stargazer Tipjar",
   "scripts": {
+    "build": "npm run lint && tsc",
     "lint": "eslint .",
     "serve": "firebase emulators:start --only functions",
     "shell": "firebase functions:shell",
@@ -12,20 +13,25 @@
   "engines": {
     "node": "12"
   },
-  "main": "index.js",
+  "main": "lib/index.js",
   "dependencies": {
-    "@stardust-collective/dag4": "^1.1.9",
+    "@stardust-collective/dag4": "^1.1.10",
     "node-fetch": "^2.6.1",
-    "firebase-admin": "^9.2.0",
-    "firebase-functions": "^3.11.0"
+    "firebase-admin": "^9.11.0",
+    "firebase-functions": "^3.14.1"
   },
   "devDependencies": {
-    "eslint": "^7.6.0",
-    "eslint-config-google": "^0.14.0",
-    "firebase-functions-test": "^0.2.0",
     "@hapi/code": "^8.0.3",
-    "@hapi/lab": "^24.2.1",
-    "mockery": "^2.1.0"
+    "@hapi/lab": "^24.3.2",
+    "@types/node-fetch": "~2.5.12",
+    "@typescript-eslint/eslint-plugin": "~4.28.5",
+    "@typescript-eslint/parser": "~4.28.5",
+    "eslint": "^7.32.0",
+    "eslint-config-google": "^0.14.0",
+    "eslint-plugin-import": "~2.23.4",
+    "firebase-functions-test": "^0.3.0",
+    "mockery": "^2.1.0",
+    "typescript": "~4.3.5"
   },
   "private": true
 }
