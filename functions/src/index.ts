@@ -15,9 +15,6 @@ exports.handleUpdate = https.onRequest(async (req, res): Promise<any> => {
   const tgUserID = req.body.message.from.id;
   const tgUsername = req.body.message.from.username;
 
-  console.log(tgUserID);
-  console.log(tgUsername);
-
   // FIXME: the commands should be inside an interface or something.
   try {
     switch (req.body.message.text) {
