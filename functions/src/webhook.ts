@@ -1,3 +1,4 @@
+import {database, initializeApp} from "firebase-admin";
 import {Telegram} from "./telegram";
 
 /**
@@ -20,6 +21,7 @@ export class Webhook {
     constructor() {
       // TODO: maybe import language file or something??
       this.telegram = new Telegram();
+      initializeApp();
     }
 
     /**
@@ -32,13 +34,15 @@ export class Webhook {
       console.log(tgUsername);
       // TODO: check if user exists, do nothing? throw error?
 
-      // await FireDB.collection("users").doc(`${tgUserID}`).set({
-      //     username: tgUsername,
-      //     wallet_id: walletAddress,
-      //     private_key: privateKey,
-      //     created_at: new Date(),
-      //     updated_at: new Date()
-      // })
+      // FIXME: use a schema.
+      database().ref("users/" + tgUserID).set({
+        username: tgUsername,
+        wallet_id: "",
+        private_key: "",
+        created_ts: new Date().getTime(),
+        updated_ts: new Date().getTime(),
+      });
+
       return this.telegram.sendKeyboard(
           tgUserID, "Welcome ", [
             [{text: "👛 Balance"}, {text: "🏦 Deposit"}],
