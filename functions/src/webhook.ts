@@ -1,28 +1,19 @@
-import {database, initializeApp} from "firebase-admin";
+import {Database} from "./database";
+import {Language} from "./language";
 import {Telegram} from "./telegram";
 
 /**
  * Class for handling all webhook calls.
  */
 export class Webhook {
-    // DEFAULT_MENU = [
-    //   [
-    //     {text: "👛 Balance"},
-    //     {text: "🏦 Deposit"},
-    //   ], [
-    //     {text: "🦮 Withdraw"},
-    //     {text: "🆘 Help"}],
-    // ];
-    telegram: Telegram
-
-    /**
-     * @constructor
-     */
-    constructor() {
-      // TODO: maybe import language file or something??
-      this.telegram = new Telegram();
-      initializeApp();
-    }
+    DEFAULT_MENU = [
+      [
+        {text: "👛 Balance"},
+        {text: "🏦 Deposit"},
+      ], [
+        {text: "🦮 Withdraw"},
+        {text: "🆘 Help"}],
+    ];
 
     /**
      * Handle the /start command.
@@ -30,24 +21,15 @@ export class Webhook {
      * @param {string} tgUsername - telegram username
      * @return {Promise}
      */
-    handleStart(tgUserID: string, tgUsername :string) : Promise<string> {
-      console.log(tgUsername);
-      // TODO: check if user exists, do nothing? throw error?
+    async handleStart(tgUserID: string, tgUsername :string) : Promise<string> {
+      await Database.getInstance().createOrUpdateUser(tgUserID, tgUsername);
 
-      // FIXME: use a schema.
-      database().ref("users/" + tgUserID).set({
-        username: tgUsername,
-        wallet_id: "",
-        private_key: "",
-        created_ts: new Date().getTime(),
-        updated_ts: new Date().getTime(),
-      });
+      const text = Language.getInstance().getString(
+          "en", "welcome", [tgUsername]
+      );
 
-      return this.telegram.sendKeyboard(
-          tgUserID, "Welcome ", [
-            [{text: "👛 Balance"}, {text: "🏦 Deposit"}],
-            [{text: "🦮 Withdraw"}, {text: "🆘 Help"}],
-          ]
+      return Telegram.getInstance().sendKeyboard(
+          tgUserID, text, this.DEFAULT_MENU
       );
     }
 
@@ -56,7 +38,7 @@ export class Webhook {
      * @return {Promise}
      */
     handleBalance(tgUserID: string) : Promise<string> {
-      return this.telegram.sendText(tgUserID, "meuk");
+      return Telegram.getInstance().sendText(tgUserID, "TODO");
     }
 
     /**
@@ -64,16 +46,7 @@ export class Webhook {
      * @return {Promise}
     */
     handleDeposit(tgUserID: string) : Promise<string> {
-      // TODO: create DAG wallet after disclaimer is accepted
-      // Or do we do this when user has read and accept disclaimer,
-      // when trying to deposit?
-      // const { privateKey, walletAddress, fullAddress }
-      // = await DAG.createWallet()
-      // const walletAddress = 'DAG8RvVRL9HCodC9n4WibddaLC3EKsbjz19hiNat'
-      // const fullAddress = "DAG8RvVRL9HCodC9n4WibddaLC3EKsbjz19hiNat";
-      // const privateKey = 'yolo'
-
-      return this.telegram.sendText(tgUserID, "meuk");
+      return Telegram.getInstance().sendText(tgUserID, "TODO");
     }
 
     /**
@@ -81,7 +54,7 @@ export class Webhook {
      * @return {Promise}
      */
     handleWithdrawal(tgUserID: string) : Promise<string> {
-      return this.telegram.sendText(tgUserID, "meuk");
+      return Telegram.getInstance().sendText(tgUserID, "TODO");
     }
 
     /**
@@ -89,7 +62,7 @@ export class Webhook {
      * @return {Promise}
      */
     handleHelp(tgUserID: string) : Promise<string> {
-      return this.telegram.sendText(tgUserID, "meuk");
+      return Telegram.getInstance().sendText(tgUserID, "TODO");
     }
 
     /**
@@ -97,6 +70,6 @@ export class Webhook {
      * @return {Promise}
      */
     handleCancel(tgUserID: string) : Promise<string> {
-      return this.telegram.sendText(tgUserID, "meuk");
+      return Telegram.getInstance().sendText(tgUserID, "TODO");
     }
 }

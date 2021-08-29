@@ -1,13 +1,10 @@
 import {https} from "firebase-functions";
 import {Webhook} from "./webhook";
 
-// TODO: here, or inside the function??
-// I think here, because it can be re-used.. right?
 const webhook = new Webhook();
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 exports.handleUpdate = https.onRequest(async (req, res): Promise<any> => {
-  // TODO: payload validation.
   console.log(JSON.stringify(req.body));
 
   if (!req.body.message) return res.status(200).send();
@@ -15,7 +12,6 @@ exports.handleUpdate = https.onRequest(async (req, res): Promise<any> => {
   const tgUserID = req.body.message.from.id;
   const tgUsername = req.body.message.from.username;
 
-  // FIXME: the commands should be inside an interface or something.
   try {
     switch (req.body.message.text) {
       case "/start":
@@ -35,7 +31,6 @@ exports.handleUpdate = https.onRequest(async (req, res): Promise<any> => {
       case "Cancel":
         await webhook.handleCancel(tgUserID); break;
       default:
-        // TODO: should we do something here?
         return res.status(200).send();
     }
 

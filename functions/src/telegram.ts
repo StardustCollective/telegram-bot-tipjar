@@ -2,6 +2,8 @@
 import {config} from "firebase-functions";
 import fetch, {Headers} from "node-fetch";
 
+let currentInstance: Telegram;
+
 /**
  * Telegram Provider class.
  * Handles all communication with Telegram API.
@@ -14,6 +16,18 @@ export class Telegram {
     constructor() {
       const TG_BOT_TOKEN = config().telegram.bot_token;
       this.url = new URL(`https://api.telegram.org/bot${TG_BOT_TOKEN}`);
+    }
+
+    /**
+     *
+     * @return {Database} current instance of the database.
+     */
+    static getInstance(): Telegram {
+      if (!currentInstance) {
+        currentInstance = new Telegram();
+      }
+
+      return currentInstance;
     }
 
     /**
@@ -59,7 +73,6 @@ export class Telegram {
      * @param {string} keyboard - The TG keyboard structure
      */
     async sendKeyboard(
-        // FIXME: create keyboard interface
         chatId: string, text: string, keyboard: unknown[][]
     ): Promise<string> {
       return await this.callAPI("sendmessage", "post", JSON.stringify({
