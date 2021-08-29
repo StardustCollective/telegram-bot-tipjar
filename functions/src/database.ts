@@ -1,4 +1,3 @@
-/* eslint-disable max-len */
 import {database, initializeApp} from "firebase-admin";
 import {DataSnapshot} from "@firebase/database-types";
 
@@ -9,16 +8,15 @@ let currentInstance: Database;
  */
 export class Database {
   /**
-    * @constructor
-    */
+   * @constructor
+   */
   constructor() {
     initializeApp();
   }
 
   /**
-     *
-     * @return {Database} current instance of the database.
-     */
+   * @return {Database} a current instance of the DB
+   */
   static getInstance(): Database {
     if (!currentInstance) {
       currentInstance = new Database();
@@ -28,24 +26,27 @@ export class Database {
   }
 
   /**
-     * Creates or updates a user.
-     * @param {string} tgUserID - telegram user id
-     * @param {string} tgUsername - telegram username
-     * @return {Promise}
-     */
-  createOrUpdateUser(tgUserID: string, tgUsername: string): Promise<DataSnapshot> {
-    return database().ref(`users/${tgUserID}/username`).once("value", (snapshot) => {
-      if (snapshot.exists()) {
-        return database().ref("users/" + tgUserID).update({username: tgUsername, updated_ts: new Date().getTime()});
-      }
+  * Creates or updates a user.
+  * @param {string} userID - telegram user id
+  * @param {string} username - telegram username
+  * @return {Promise}
+  */
+  createOrUpdateUser(userID: string, username: string): Promise<DataSnapshot> {
+    return database().ref(`users/${userID}/username`)
+        .once("value", (snapshot) => {
+          if (snapshot.exists()) {
+            return database().ref("users/" + userID).update(
+                {username: username, updated_ts: new Date().getTime()}
+            );
+          }
 
-      return database().ref("users/" + tgUserID).set({
-        username: tgUsername,
-        wallet_id: "",
-        private_key: "",
-        created_ts: new Date().getTime(),
-        updated_ts: new Date().getTime(),
-      });
-    });
+          return database().ref("users/" + userID).set({
+            username: username,
+            wallet_id: "",
+            private_key: "",
+            created_ts: new Date().getTime(),
+            updated_ts: new Date().getTime(),
+          });
+        });
   }
 }

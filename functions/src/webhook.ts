@@ -7,69 +7,134 @@ import {Telegram} from "./telegram";
  */
 export class Webhook {
     DEFAULT_MENU = [
-      [
-        {text: "👛 Balance"},
-        {text: "🏦 Deposit"},
-      ], [
-        {text: "🦮 Withdraw"},
-        {text: "🆘 Help"}],
+      [{text: "👛 Balance"}, {text: "🏦 Deposit"}],
+      [{text: "🦮 Withdraw"}, {text: "🆘 Help"}],
     ];
 
     /**
      * Handle the /start command.
-     * @param {string} tgUserID - telegram user id
+     * @param {string} tgUserId - telegram user id
      * @param {string} tgUsername - telegram username
      * @return {Promise}
      */
-    async handleStart(tgUserID: string, tgUsername :string) : Promise<string> {
-      await Database.getInstance().createOrUpdateUser(tgUserID, tgUsername);
+    async handleStart(tgUserId: string, tgUsername :string) : Promise<string> {
+      await Database.getInstance().createOrUpdateUser(tgUserId, tgUsername);
 
-      const text = Language.getInstance().getString(
+      const text = Language.getString(
           "en", "welcome", [tgUsername]
       );
 
       return Telegram.getInstance().sendKeyboard(
-          tgUserID, text, this.DEFAULT_MENU
+          tgUserId, text, this.DEFAULT_MENU
       );
     }
 
     /**
-     * @param {string} tgUserID - telegram user id
+     * @param {string} tgUserId - telegram user id
      * @return {Promise}
      */
-    handleBalance(tgUserID: string) : Promise<string> {
-      return Telegram.getInstance().sendText(tgUserID, "TODO");
+    handleBalance(tgUserId: string) : Promise<string> {
+      return Telegram.getInstance().sendText(tgUserId, "TODO");
     }
 
     /**
-     * @param {string} tgUserID - telegram user id
+     * @param {string} tgUserId - telegram user id
      * @return {Promise}
     */
-    handleDeposit(tgUserID: string) : Promise<string> {
-      return Telegram.getInstance().sendText(tgUserID, "TODO");
+    handleDeposit(tgUserId: string) : Promise<string> {
+      return Telegram.getInstance().sendText(tgUserId, "TODO");
     }
 
     /**
-     * @param {string} tgUserID - telegram user id
+     * @param {string} tgUserId - telegram user id
      * @return {Promise}
      */
-    handleWithdrawal(tgUserID: string) : Promise<string> {
-      return Telegram.getInstance().sendText(tgUserID, "TODO");
+    handleWithdrawal(tgUserId: string) : Promise<string> {
+      return Telegram.getInstance().sendText(tgUserId, "TODO");
     }
 
     /**
-     * @param {string} tgUserID - telegram user id
+     * @param {string} tgUserId - telegram user id
+     * @param {string} chatId - if previous message should be edited.
+     * @param {string} messageId - if previous message should be edited.
      * @return {Promise}
      */
-    handleHelp(tgUserID: string) : Promise<string> {
-      return Telegram.getInstance().sendText(tgUserID, "TODO");
+    handleHelp(tgUserId: string, chatId?: string, messageId?: string) :
+    Promise<string> {
+      const text = Language.getString( "en", "help_title");
+      const inlineKeyboard = [
+        [{
+          "text": Language.getString( "en", "help_get_started"),
+          "callback_data": "help_get_started",
+        }],
+        [{
+          "text": Language.getString( "en", "help_get_started"),
+          "callback_data": "help_disclaimer",
+        }],
+        [{
+          "text": Language.getString( "en", "help_get_started"),
+          "callback_data": "help_how_to_deposit",
+        }],
+        [{
+          "text": Language.getString( "en", "help_get_started"),
+          "callback_data": "help_how_to_withdrawal",
+        }],
+        [{
+          "text": Language.getString( "en", "help_get_started"),
+          "callback_data": "help_how_to_check_balance",
+        }],
+        [{
+          "text": Language.getString( "en", "help_get_started"),
+          "callback_data": "help_about_us",
+        }],
+      ];
+
+      if (chatId && messageId) {
+        return Telegram.getInstance().editMessage(
+            chatId, messageId, text, inlineKeyboard
+        );
+      }
+
+      return Telegram.getInstance().sendText(
+          tgUserId, text, inlineKeyboard
+      );
     }
 
     /**
-     * @param {string} tgUserID - telegram user id
+     *
+     * @param {string} tgUserId
+     * @param {string} chatId
+     * @param {string} messageId
+     * @param {string} data
+     * @return {Prromise}
+     */
+    handleCallbackQuery(
+        tgUserId: string, chatId: string, messageId: string, data: string
+    ) : Promise<string> {
+      const section = data.slice(0, data.indexOf("_"));
+      const subject = data.slice(data.indexOf("_") + 1);
+
+      if (subject === "cancel") {
+        // TODO: improve
+        if (section === "help") {
+          return this.handleHelp(tgUserId, chatId, messageId);
+        }
+      }
+
+      return Telegram.getInstance().editMessage(
+          chatId, messageId, `<TODO text for ${section}-${subject}>`,
+          [[{
+            "text": Language.getString( "en", "return"),
+            "callback_data": `${section}_cancel`},
+          ]]
+      );
+    }
+
+    /**
+     * @param {string} tgUserId - telegram user id
      * @return {Promise}
      */
-    handleCancel(tgUserID: string) : Promise<string> {
-      return Telegram.getInstance().sendText(tgUserID, "TODO");
+    handleCancel(tgUserId: string) : Promise<string> {
+      return Telegram.getInstance().sendText(tgUserId, "TODO");
     }
 }

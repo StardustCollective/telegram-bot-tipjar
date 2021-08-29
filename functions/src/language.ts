@@ -9,7 +9,7 @@ let currentInstance: Language;
  * throughout the project.
  */
 export class Language {
-    en: any
+    en: any // FIXME: improve this.
     /**
      * @constructor
      */
@@ -20,14 +20,17 @@ export class Language {
 
     /**
      *
-     * @return {Language} current instance of this class.
+     * @param {string} language the language to pick
+     * @param {string} key the key from the language file
+     * @param {string} tokens any tokens to be replaced,
+     * inside the template string
+     * @return {string} the translated string
      */
-    static getInstance(): Language {
-      if (!currentInstance) {
-        currentInstance = new Language();
-      }
-
-      return currentInstance;
+    static getString(
+        language: string, key: string, tokens?: Array<string>
+    ): string {
+      if (!currentInstance) currentInstance = new Language();
+      return currentInstance.getString(language, key, tokens);
     }
 
     /**
@@ -38,10 +41,11 @@ export class Language {
      * inside the template string
      * @return {string} the translated string
      */
-    getString(language: string, key: string, tokens: Array<string> ) : string {
+    getString(language: string, key: string, tokens?: Array<string> ) : string {
       // FIXME: replace tokens in string, handle language key
       console.log(language);
       console.log(tokens);
-      return this.en[key];
+      // FIXME: fetch children?
+      return this.en[key] || "<Missing Translation>";
     }
 }
