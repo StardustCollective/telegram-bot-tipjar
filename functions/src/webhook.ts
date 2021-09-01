@@ -61,30 +61,30 @@ export class Webhook {
      */
     handleHelp(tgUserId: string, chatId?: string, messageId?: string) :
     Promise<string> {
-      const text = Language.getString( "en", "help_title");
+      const text = Language.getString( "en", "help.title");
       const inlineKeyboard = [
         [{
           "text": Language.getString( "en", "help_get_started"),
           "callback_data": "help_get_started",
         }],
         [{
-          "text": Language.getString( "en", "help_get_started"),
+          "text": Language.getString( "en", "help_disclaimer"),
           "callback_data": "help_disclaimer",
         }],
         [{
-          "text": Language.getString( "en", "help_get_started"),
+          "text": Language.getString( "en", "help_how_to_deposit"),
           "callback_data": "help_how_to_deposit",
         }],
         [{
-          "text": Language.getString( "en", "help_get_started"),
+          "text": Language.getString( "en", "help_how_to_withdrawal"),
           "callback_data": "help_how_to_withdrawal",
         }],
         [{
-          "text": Language.getString( "en", "help_get_started"),
+          "text": Language.getString( "en", "help_how_to_check_balance"),
           "callback_data": "help_how_to_check_balance",
         }],
         [{
-          "text": Language.getString( "en", "help_get_started"),
+          "text": Language.getString( "en", "help_about_us"),
           "callback_data": "help_about_us",
         }],
       ];
@@ -114,27 +114,19 @@ export class Webhook {
       const section = data.slice(0, data.indexOf("_"));
       const subject = data.slice(data.indexOf("_") + 1);
 
+      // TODO: improve, with more flows.
       if (subject === "cancel") {
-        // TODO: improve
         if (section === "help") {
           return this.handleHelp(tgUserId, chatId, messageId);
         }
       }
 
       return Telegram.getInstance().editMessage(
-          chatId, messageId, `<TODO text for ${section}-${subject}>`,
+          chatId, messageId, Language.getString("en", `${section}-${subject}`),
           [[{
             "text": Language.getString( "en", "return"),
             "callback_data": `${section}_cancel`},
           ]]
       );
-    }
-
-    /**
-     * @param {string} tgUserId - telegram user id
-     * @return {Promise}
-     */
-    handleCancel(tgUserId: string) : Promise<string> {
-      return Telegram.getInstance().sendText(tgUserId, "TODO");
     }
 }

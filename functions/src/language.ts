@@ -1,6 +1,7 @@
 
 import {readFileSync} from "fs";
 
+const PLACEHOLDER_LANG = new RegExp(/{{(.*?)}}/g);
 let currentInstance: Language;
 
 /**
@@ -9,13 +10,14 @@ let currentInstance: Language;
  * throughout the project.
  */
 export class Language {
-    en: any // FIXME: improve this.
+    translations: any
     /**
      * @constructor
      */
     constructor() {
-      this.en = JSON.parse(readFileSync("./lang/en.json").toString());
-      console.log(this.en);
+      this.translations = [];
+      this.translations["en"] =
+        JSON.parse(readFileSync("./lang/en.json").toString());
     }
 
     /**
@@ -27,7 +29,7 @@ export class Language {
      * @return {string} the translated string
      */
     static getString(
-        language: string, key: string, tokens?: Array<string>
+        language: string, key: string, tokens?: Map<string, string>
     ): string {
       if (!currentInstance) currentInstance = new Language();
       return currentInstance.getString(language, key, tokens);
@@ -41,11 +43,16 @@ export class Language {
      * inside the template string
      * @return {string} the translated string
      */
-    getString(language: string, key: string, tokens?: Array<string> ) : string {
-      // FIXME: replace tokens in string, handle language key
-      console.log(language);
-      console.log(tokens);
-      // FIXME: fetch children?
-      return this.en[key] || "<Missing Translation>";
+    getString(language: string, key: string,
+        tokens: Map<string, string> = new Map()) : string {
+      // FIXME: still broken
+      if (tokens.size > 0) {
+        return (this.translations[language][key] || "")
+            .replace(PLACEHOLDER_LANG, (
+                placeholder: string, capturedText: string
+            ) => tokens.get(capturedText));
+      }
+
+      return this.translations[language][key] || "<Missing Translation>";
     }
 }

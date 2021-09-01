@@ -1,5 +1,5 @@
 {
-    "welcome": "Hi {username}!\r\n\r\nUse the buttons below to check your balance and explore your wallet.\r\nWant to start sending and receiving $DAG? Join the DAGBot group chat and see how other people are using DAGBot.\r\n\r\nFor a quick tutorial click 'Help' below.",
+    "welcome": "Hi {{username}}!\r\n\r\nUse the buttons below to check your balance and explore your wallet.\r\nWant to start sending and receiving $DAG? Join the DAGBot group chat and see how other people are using DAGBot.\r\n\r\nFor a quick tutorial click 'Help' below.",
     "return": "Return",
     "help": {
         "title": "Choose a topic below, to learn more about it.",
@@ -9,5 +9,6 @@
         "how_to_withdrawal": "How To Withdrawal",
         "how_to_check_balance": "How To Check Balance",
         "about_us": "About Us"
-    }
+    },
+    "help-get_started": "To get started using this bot;\r\nClick the buttons {{username}}..\r\n(TODO)"
 }
