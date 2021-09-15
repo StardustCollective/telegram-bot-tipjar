@@ -19,9 +19,10 @@ export class Webhook {
      */
     async handleStart(tgUserId: string, tgUsername :string) : Promise<string> {
       await Database.getInstance().createOrUpdateUser(tgUserId, tgUsername);
-
+      const tokens = new Map();
+      tokens.set("username", tgUsername);
       const text = Language.getString(
-          "en", "welcome", [tgUsername]
+          "en", "welcome", tokens
       );
 
       return Telegram.getInstance().sendKeyboard(
@@ -54,6 +55,20 @@ export class Webhook {
     }
 
     /**
+     *
+     * @param {string} language the language to use
+     * @param {string} path the path of translation
+     * @return {Array} a TG formatted keyboard button
+     */
+    _addKeyboardButton(language :string, path :string)
+        : Array<Record<string, string>> {
+      return [{
+        "text": Language.getString(language, path),
+        "callback_data": path,
+      }];
+    }
+
+    /**
      * @param {string} tgUserId - telegram user id
      * @param {string} chatId - if previous message should be edited.
      * @param {string} messageId - if previous message should be edited.
@@ -63,30 +78,12 @@ export class Webhook {
     Promise<string> {
       const text = Language.getString( "en", "help.title");
       const inlineKeyboard = [
-        [{
-          "text": Language.getString( "en", "help_get_started"),
-          "callback_data": "help_get_started",
-        }],
-        [{
-          "text": Language.getString( "en", "help_disclaimer"),
-          "callback_data": "help_disclaimer",
-        }],
-        [{
-          "text": Language.getString( "en", "help_how_to_deposit"),
-          "callback_data": "help_how_to_deposit",
-        }],
-        [{
-          "text": Language.getString( "en", "help_how_to_withdrawal"),
-          "callback_data": "help_how_to_withdrawal",
-        }],
-        [{
-          "text": Language.getString( "en", "help_how_to_check_balance"),
-          "callback_data": "help_how_to_check_balance",
-        }],
-        [{
-          "text": Language.getString( "en", "help_about_us"),
-          "callback_data": "help_about_us",
-        }],
+        this._addKeyboardButton("en", "buttons.help.get_started"),
+        this._addKeyboardButton("en", "buttons.help.disclaimer"),
+        this._addKeyboardButton("en", "buttons.help.how_to_deposit"),
+        this._addKeyboardButton("en", "buttons.help.how_to_withdrawal"),
+        this._addKeyboardButton("en", "buttons.help.how_to_check_balance"),
+        this._addKeyboardButton("en", "buttons.help.about_us"),
       ];
 
       if (chatId && messageId) {
@@ -111,22 +108,22 @@ export class Webhook {
     handleCallbackQuery(
         tgUserId: string, chatId: string, messageId: string, data: string
     ) : Promise<string> {
-      const section = data.slice(0, data.indexOf("_"));
-      const subject = data.slice(data.indexOf("_") + 1);
+      data = data.replace("buttons.", "");
+      const section = data.slice(0, data.indexOf("."));
+      const subject = data.slice(data.indexOf(".") + 1);
 
       // TODO: improve, with more flows.
-      if (subject === "cancel") {
+      if (subject === "return") {
         if (section === "help") {
           return this.handleHelp(tgUserId, chatId, messageId);
         }
       }
 
       return Telegram.getInstance().editMessage(
-          chatId, messageId, Language.getString("en", `${section}-${subject}`),
-          [[{
-            "text": Language.getString( "en", "return"),
-            "callback_data": `${section}_cancel`},
-          ]]
+          chatId, messageId, Language.getString("en", `${section}.${subject}`),
+          [
+            this._addKeyboardButton("en", `${section}.return`),
+          ]
       );
     }
 }
