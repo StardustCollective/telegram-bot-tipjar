@@ -1,7 +1,8 @@
 # telegram-bot
 
 ## Run locally;
-`npm serve` to start Firebase Emulators.
+`npm run-script develop` to start TypeScript compiler in watch mode.
+`npm run-script serve` to start Firebase Emulators.
 `ngrok http 7001` to setup a tunnel to local firebase emulator.
 
 Set TG webhook URL e.g.;

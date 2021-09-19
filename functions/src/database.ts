@@ -44,9 +44,50 @@ export class Database {
             username: username,
             wallet_id: "",
             private_key: "",
+            accepted_dsc_ts: null,
             created_ts: new Date().getTime(),
             updated_ts: new Date().getTime(),
           });
+        });
+  }
+
+
+  /**
+  * Gets an existing a user by telegram user id.
+  * @param {string} userID - telegram user id
+  * @return {Promise}
+  */
+  getUser(userID: string): Promise<any> {
+    return new Promise((resolve, reject) => {
+      database().ref(`users/${userID}`)
+          .once("value", (snapshot) => {
+            resolve(snapshot.val());
+          }, (error) => {
+            reject(error);
+          });
+    });
+  }
+
+  /**
+  * Sets the walletID for a given user.
+  * @param {string} userID - telegram user id
+  * @param {string} walletID - constellation wallet id.
+  * @param {string} privateKey - constellation wallet private key.
+  * @return {Promise}
+  */
+  setWalletID(userID: string, walletID: string, privateKey: string):
+    Promise<any> {
+    return database().ref(`users/${userID}/username`)
+        .once("value", (snapshot) => {
+          if (snapshot.exists()) {
+            return database().ref("users/" + userID).update({
+              wallet_id: walletID,
+              private_key: privateKey,
+              accepted_dsc_ts: new Date().getTime(),
+              updated_ts: new Date().getTime(),
+            });
+          }
+          return null;
         });
   }
 }

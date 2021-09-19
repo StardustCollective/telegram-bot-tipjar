@@ -8,6 +8,10 @@
             "how_to_withdrawal": "How To Withdrawal",
             "how_to_check_balance": "How To Check Balance",
             "about_us": "About Us"
+        },
+        "disclaimer": {
+            "accept": "Yes, I agree with the above.",
+            "decline": "No, I don't agree with the above disclaimer."
         }
     },
     "help": {
@@ -20,5 +24,12 @@
         "how_to_check_balance": "click the balance button  (TODO)",
         "about_us": "We are from constellation (TODO)"
     },
-    "help-get_started": "To get started using this bot;\r\n(TODO)"
+    "help-get_started": "To get started using this bot;\r\n(TODO)",
+    "balance": {
+        "text": "These are your balance and current daily limits;\r\n*Your current balance*: DAG {{balance}}\r\nYour remaining daily limits;\r\n*Send Limit*: DAG {{send_limit}}\r\n*nWithdrawal Limit*: DAG {{withdrawal_limit}}"
+    },
+    "disclaimer": {
+        "finished": "Yay, your wallet is created! Deposit some DAG into your wallet with /deposit 🥰",
+        "declined": "Okay, no worries. If you change your mind, you know where to find us 😎"
+    }
 }
