@@ -64,6 +64,7 @@ export class Telegram {
     Promise<string> {
       const payload = {
         "chat_id": chatId,
+        "parse_mode": "html",
         "text": text,
         "reply_markup": {},
       };

@@ -1,5 +1,5 @@
 {
-    "welcome": "Hi {{username}}!\r\n\r\nUse the buttons below to check your balance and explore your wallet.\r\nWant to start sending and receiving $DAG? Join the DAGBot group chat and see how other people are using DAGBot.\r\n\r\nFor a quick tutorial click 'Help' below.",
+    "welcome": "Hi @{{username}}!\r\n\r\nUse the buttons below to check your balance and explore your wallet.\r\n\r\nWant to start sending and receiving $DAG? Join the DAGBot group chat and see how other people are using DAGBot.\r\n\r\nFor a quick tutorial click 'Help' below.",
     "buttons": {
         "help": {
             "get_started": "Get Started",
@@ -24,12 +24,15 @@
         "how_to_check_balance": "click the balance button  (TODO)",
         "about_us": "We are from constellation (TODO)"
     },
-    "help-get_started": "To get started using this bot;\r\n(TODO)",
+    "help-get_started": "To get started using this bot;\r\n\r\n(TODO)",
     "balance": {
-        "text": "These are your balance and current daily limits;\r\n*Your current balance*: DAG {{balance}}\r\nYour remaining daily limits;\r\n*Send Limit*: DAG {{send_limit}}\r\n*nWithdrawal Limit*: DAG {{withdrawal_limit}}"
+        "text": "These are your balance and current daily limits.\r\n\r\n<b>Your current balance</b>:\r\nDAG {{balance}}\r\n\r\nYour remaining daily limits;\r\n\r\n<b>Send Limit</b>: DAG {{send_limit}}\r\n<b>Withdrawal Limit</b>: DAG {{withdrawal_limit}}"
     },
     "disclaimer": {
         "finished": "Yay, your wallet is created! Deposit some DAG into your wallet with /deposit 🥰",
         "declined": "Okay, no worries. If you change your mind, you know where to find us 😎"
+    },
+    "deposit": {
+        "text": "Please send your DAG deposit to:\r\n\r\n<b>{{wallet_address}}</b>\r\n\r\nThis address is unique to you and all DAG deposited to this address will be credited to your DAGBot wallet."
     }
 }

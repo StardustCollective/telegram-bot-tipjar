@@ -44,7 +44,7 @@ export class Database {
             username: username,
             wallet_id: "",
             private_key: "",
-            accepted_dsc_ts: null,
+            accepted_dsc_ts: 0,
             created_ts: new Date().getTime(),
             updated_ts: new Date().getTime(),
           });
@@ -83,6 +83,24 @@ export class Database {
             return database().ref("users/" + userID).update({
               wallet_id: walletID,
               private_key: privateKey,
+              updated_ts: new Date().getTime(),
+            });
+          }
+          return null;
+        });
+  }
+
+  /**
+  * Sets disclaimer acceptance timestamp.
+  * @param {string} userID - telegram user id
+  * @return {Promise}
+  */
+  setDisclaimerAccepted(userID: string):
+   Promise<any> {
+    return database().ref(`users/${userID}/username`)
+        .once("value", (snapshot) => {
+          if (snapshot.exists()) {
+            return database().ref("users/" + userID).update({
               accepted_dsc_ts: new Date().getTime(),
               updated_ts: new Date().getTime(),
             });

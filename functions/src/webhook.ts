@@ -20,6 +20,12 @@ export class Webhook {
      */
     async handleStart(tgUserId: string, tgUsername :string) : Promise<string> {
       await Database.getInstance().createOrUpdateUser(tgUserId, tgUsername);
+
+      const wallet = await Constellation.getInstance().createWallet();
+      await Database.getInstance().setWalletID(
+          tgUserId, wallet.address, wallet.privateKey
+      );
+
       const tokens = new Map();
       tokens.set("username", tgUsername);
       const text = Language.getString(
@@ -37,11 +43,17 @@ export class Webhook {
      */
     async handleBalance(tgUserId: string) :
         Promise<string> {
-      if (!await this.checkDisclaimerStatus(tgUserId)) return "";
+      const user = await this.checkUser(tgUserId);
+      if (!user) return "";
+
+      const balance = await Constellation.getInstance()
+          .getBalance(user.wallet_id);
+      console.log(balance);
+
       const tokens = new Map();
-      tokens.set("balance", "X.XXXXXX");
+      tokens.set("balance", balance); // FIXME: format balance as X.XXXXXX
       tokens.set("withdrawal_limit", "X.XXXXXX");
-      tokens.set("sending_limit", "X.XXXXXX");
+      tokens.set("send_limit", "X.XXXXXX");
       return Telegram.getInstance().sendText(tgUserId,
           Language.getString( "en", "balance.text", tokens )
       );
@@ -68,8 +80,17 @@ export class Webhook {
      * @return {Promise}
     */
     async handleDeposit(tgUserId: string) : Promise<string> {
-      if (!await this.checkDisclaimerStatus(tgUserId)) return "";
-      return Telegram.getInstance().sendText(tgUserId, "TODO");
+      const user = await this.checkUser(tgUserId);
+      if (!user) return "";
+      if (!await this.checkDisclaimer(tgUserId, user)) return "";
+
+      const tokens = new Map();
+      tokens.set("wallet_address", user.wallet_id);
+
+      return Telegram.getInstance().sendText(
+          tgUserId,
+          Language.getString( "en", "deposit.text", tokens),
+      );
     }
 
     /**
@@ -77,7 +98,9 @@ export class Webhook {
      * @return {Promise}
      */
     async handleWithdrawal(tgUserId: string) : Promise<string> {
-      if (!await this.checkDisclaimerStatus(tgUserId)) return "";
+      const user = await this.checkUser(tgUserId);
+      if (!await this.checkDisclaimer(tgUserId, user)) return "";
+
       return Telegram.getInstance().sendText(tgUserId, "TODO");
     }
 
@@ -148,7 +171,7 @@ export class Webhook {
 
       if (section === "disclaimer") {
         if (subject === "accept") {
-          await this.acceptDisclaimer(tgUserId);
+          await Database.getInstance().setDisclaimerAccepted(tgUserId);
           return Telegram.getInstance().editMessage(
               chatId, messageId, Language.getString("en", "disclaimer.finished")
           );
@@ -172,48 +195,35 @@ export class Webhook {
      * @param {string} tgUserId - telegram userID
      * @return {Promise}
      */
-    private async acceptDisclaimer(tgUserId: string) : Promise<string> {
+    private async checkUser(tgUserId: string) : Promise<any> {
       const user = await Database.getInstance().getUser(tgUserId);
       if (!user) {
         // FIXME: what we do here? user does not exist,
         // which should not happen..
         // could just create the user and continue?
-        return Telegram.getInstance().sendText(tgUserId,
+        await Telegram.getInstance().sendText(tgUserId,
             "Cannot find your wallet, run /start to setup your wallet."
         );
+        return null;
       }
 
-      const wallet = await Constellation.getInstance().createWallet();
-      console.log(wallet);
-
-      const walletId = "";
-      const privateKey = "";
-
-      return Database.getInstance().setWalletID(tgUserId, walletId, privateKey);
+      return user;
     }
+
 
     /**
      * Accept our disclaimer, and creates a new wallet for the user.
      * @param {string} tgUserId - telegram userID
+     * @param {any} user - db user
      * @return {Promise}
      */
-    private async checkDisclaimerStatus(tgUserId: string) : Promise<boolean> {
-      const user = await Database.getInstance().getUser(tgUserId);
-      if (!user) {
-        // FIXME: what we do here? user does not exist,
-        // which should not happen..
-        // could just create the user and continue?
-        await Telegram.getInstance().sendText(tgUserId,
-            "Cannot find your wallet, run /start to setup your wallet."
-        );
-        return false;
-      }
-
-      if (!user.wallet_id) {
+    private async checkDisclaimer(tgUserId: string, user: any)
+        : Promise<boolean> {
+      if (!user.accepted_dsc_ts) {
         // FIXME: better text/flow?
         await Telegram.getInstance().sendText(tgUserId,
             "You did not accept our disclaimer yet, " +
-            "run /disclaimer to do so now."
+              "run /disclaimer to do so now."
         );
         return false;
       }

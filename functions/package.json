@@ -18,12 +18,13 @@
   "main": "lib/index.js",
   "dependencies": {
     "@stardust-collective/dag4": "^1.1.10",
-    "node-fetch": "^2.6.1",
     "firebase-admin": "^9.11.0",
-    "firebase-functions": "^3.14.1"
+    "firebase-functions": "^3.15.6",
+    "node-fetch": "^2.6.1"
   },
   "devDependencies": {
     "@types/chai": "~4.2.21",
+    "@types/elliptic": "^6.4.13",
     "@types/mocha": "~9.0.0",
     "@types/node-fetch": "~2.5.12",
     "@types/sinon": "~10.0.2",
