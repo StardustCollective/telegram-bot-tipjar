@@ -48,7 +48,7 @@ export class Language {
     ) : string {
       const translated = path.split(".").reduce(
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          (currentObject :any, property :any) =>
+          (currentObject :any, property :string) =>
             currentObject?.[property], this.translations[language]);
       if (tokens.size > 0) {
         return translated
@@ -56,6 +56,7 @@ export class Language {
                 (_: string, capturedText: string) => tokens.get(capturedText));
       }
 
-      return translated || "<Missing Translation>";
+      if (!translated) throw new Error("Missing translation");
+      return translated;
     }
 }

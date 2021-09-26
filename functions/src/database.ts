@@ -1,5 +1,7 @@
+import {config} from "firebase-functions";
 import {database, initializeApp} from "firebase-admin";
 import {DataSnapshot} from "@firebase/database-types";
+import {DBUser} from "./models/user";
 
 let currentInstance: Database;
 
@@ -11,7 +13,11 @@ export class Database {
    * @constructor
    */
   constructor() {
-    initializeApp();
+    if (config().env.production) {
+      initializeApp({databaseURL: config().env.databaseURL});
+    } else {
+      initializeApp();
+    }
   }
 
   /**
@@ -26,86 +32,38 @@ export class Database {
   }
 
   /**
-  * Creates or updates a user.
+  * Creates an new a user by telegram user id, and saves it to DB.
   * @param {string} userID - telegram user id
   * @param {string} username - telegram username
-  * @return {Promise}
+  * @return {Promise} returns DB
   */
-  createOrUpdateUser(userID: string, username: string): Promise<DataSnapshot> {
-    return database().ref(`users/${userID}/username`)
-        .once("value", (snapshot) => {
-          if (snapshot.exists()) {
-            return database().ref("users/" + userID).update(
-                {username: username, updated_ts: new Date().getTime()}
-            );
-          }
-
-          return database().ref("users/" + userID).set({
-            username: username,
-            wallet_id: "",
-            private_key: "",
-            accepted_dsc_ts: 0,
-            created_ts: new Date().getTime(),
-            updated_ts: new Date().getTime(),
-          });
-        });
+  async createUser(userID: string, username: string): Promise<DBUser> {
+    const user = new DBUser(username);
+    await database().ref(`users/${userID}`).set(user);
+    return user;
   }
-
 
   /**
   * Gets an existing a user by telegram user id.
   * @param {string} userID - telegram user id
-  * @return {Promise}
+  * @return {Promise} returns DB
   */
-  getUser(userID: string): Promise<any> {
-    return new Promise((resolve, reject) => {
-      database().ref(`users/${userID}`)
-          .once("value", (snapshot) => {
-            resolve(snapshot.val());
-          }, (error) => {
-            reject(error);
-          });
-    });
+  async getUser(userID: string): Promise<DBUser | null> {
+    const snapshot = await database().ref(`users/${userID}`)
+        .once("value", (snapshot) => snapshot);
+
+    return DBUser.fromSnapshot(snapshot);
   }
 
   /**
-  * Sets the walletID for a given user.
+  * Updates given DBUser in database
   * @param {string} userID - telegram user id
-  * @param {string} walletID - constellation wallet id.
-  * @param {string} privateKey - constellation wallet private key.
+  * @param {DBUser} user - db user object
   * @return {Promise}
   */
-  setWalletID(userID: string, walletID: string, privateKey: string):
-    Promise<any> {
-    return database().ref(`users/${userID}/username`)
-        .once("value", (snapshot) => {
-          if (snapshot.exists()) {
-            return database().ref("users/" + userID).update({
-              wallet_id: walletID,
-              private_key: privateKey,
-              updated_ts: new Date().getTime(),
-            });
-          }
-          return null;
-        });
-  }
-
-  /**
-  * Sets disclaimer acceptance timestamp.
-  * @param {string} userID - telegram user id
-  * @return {Promise}
-  */
-  setDisclaimerAccepted(userID: string):
-   Promise<any> {
-    return database().ref(`users/${userID}/username`)
-        .once("value", (snapshot) => {
-          if (snapshot.exists()) {
-            return database().ref("users/" + userID).update({
-              accepted_dsc_ts: new Date().getTime(),
-              updated_ts: new Date().getTime(),
-            });
-          }
-          return null;
-        });
+  saveUser(userID : string, user: DBUser): Promise<DataSnapshot> {
+    if (!userID) throw new Error("UserID cannot be empty!");
+    user.updatedTS = new Date().getTime();
+    return database().ref(`users/${userID}`).update(user);
   }
 }
