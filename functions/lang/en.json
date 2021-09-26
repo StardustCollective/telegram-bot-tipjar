@@ -1,0 +1,24 @@
+{
+    "welcome": "Hi {{username}}!\r\n\r\nUse the buttons below to check your balance and explore your wallet.\r\nWant to start sending and receiving $DAG? Join the DAGBot group chat and see how other people are using DAGBot.\r\n\r\nFor a quick tutorial click 'Help' below.",
+    "buttons": {
+        "help": {
+            "get_started": "Get Started",
+            "disclaimer": "Disclaimer",
+            "how_to_deposit": "How To Deposit",
+            "how_to_withdrawal": "How To Withdrawal",
+            "how_to_check_balance": "How To Check Balance",
+            "about_us": "About Us"
+        }
+    },
+    "help": {
+        "title": "Choose a topic below, to learn more about it.",
+        "return": "Return",
+        "get_started": "getting started (TODO)",
+        "disclaimer": "this is the disclaime (TODO)",
+        "how_to_deposit": "transfer funds to XXX (TODO)",
+        "how_to_withdrawal": "ask the bot for your address and request transfer (TODO)",
+        "how_to_check_balance": "click the balance button  (TODO)",
+        "about_us": "We are from constellation (TODO)"
+    },
+    "help-get_started": "To get started using this bot;\r\n(TODO)"
+}
