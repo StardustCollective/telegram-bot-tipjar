@@ -1,7 +1,7 @@
 import {config} from "firebase-functions";
 import {database, initializeApp} from "firebase-admin";
 import {DataSnapshot} from "@firebase/database-types";
-import {DBUser} from "./models/user";
+import {DBUser} from "./user";
 
 let currentInstance: Database;
 

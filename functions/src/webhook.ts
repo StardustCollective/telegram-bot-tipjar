@@ -1,6 +1,6 @@
 import {Constellation} from "./constellation";
 import {Database} from "./database";
-import {DBUser} from "./models/user";
+import {DBUser} from "./user";
 import {Language} from "./language";
 import {Telegram} from "./telegram";
 

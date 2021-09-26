@@ -1,7 +1,6 @@
 import {config} from "firebase-functions";
 import {dag4} from "@stardust-collective/dag4";
 import fetch from "node-fetch";
-import {Wallet} from "./models/wallet";
 
 let currentInstance: Constellation;
 
@@ -72,7 +71,7 @@ export class Constellation {
       const result = await dag4.network.loadBalancerApi
           .getAddressBalance(wallet.address);
 
-      if (!result || !result.balance) return 0 * 1e-8;
+      if (!result || !result.balance) return 0;
       return result.balance * 1e-8;
     }
 }

@@ -1,13 +1,4 @@
 import {DataSnapshot} from "@firebase/database-types";
-import {Wallet} from "./wallet";
-
-interface UserSchema {
-    username: string,
-    wallet?: Wallet,
-    acceptedDisclaimerTS: number,
-    createdTS: number,
-    updatedTS: number
-}
 
 /**
  * DBUser class
