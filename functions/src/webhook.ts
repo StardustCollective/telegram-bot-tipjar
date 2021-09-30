@@ -106,10 +106,21 @@ export class Webhook {
      */
     async handleWithdrawal(userId: string) : Promise<string> {
       const user = await this.checkUser(userId);
-      if (!user) return "";
+      if (!user || !user.wallet) return "";
       if (!await this.checkDisclaimer(userId, user)) return "";
 
-      return Telegram.getInstance().sendText(userId, "TODO");
+      const balance = await Constellation.getInstance()
+          .getBalance(user.wallet);
+
+      const tokens = new Map();
+      tokens.set("balance", balance);
+      await Database.getInstance().setState(
+          userId, {path: "withdrawal", section: "amount", balance: balance}
+      );
+      return Telegram.getInstance().sendText(
+          userId, Language.getString( "en", "withdrawal.text", tokens),
+          undefined, true
+      );
     }
 
     /**
@@ -124,6 +135,65 @@ export class Webhook {
         "text": Language.getString(language, path),
         "callback_data": path,
       }];
+    }
+
+    /**
+     * Handles input from withdrawal flow, could be expanded to more later.
+     * @param {string} userId the telegram user id
+     * @param {string} input whatever the user input
+     * @return {Promise}
+     */
+    async handleDefault(userId: string, input: string) : Promise<string> {
+      const user = await this.checkUser(userId);
+      if (!user || !user.wallet) return "";
+
+      const state = await Database.getInstance().getState(userId);
+      if (!state) return "";
+
+      if (state.path === "withdrawal") {
+        const withdrawalState = state as WithdrawalState;
+        console.log(withdrawalState);
+        console.log(input);
+        if (withdrawalState.section === "amount") {
+          withdrawalState.amount = parseInt(input, 10);
+          if (!withdrawalState.amount || isNaN(withdrawalState.amount)) {
+            return Telegram.getInstance().sendText(
+                userId, Language.getString( "en", "withdrawal.invalid_amount")
+            );
+          } else if (withdrawalState.amount > withdrawalState.balance) {
+            return Telegram.getInstance().sendText(
+                userId, Language.getString( "en",
+                    "withdrawal.insufficient_balance"
+                )
+            );
+          }
+          withdrawalState.section = "destination";
+          await Database.getInstance().setState(userId, withdrawalState);
+          return Telegram.getInstance().sendText(
+              userId, Language.getString( "en", "withdrawal.destination_text")
+          );
+        } else if (withdrawalState.section === "destination") {
+          withdrawalState.destinationAddress = input;
+
+          // FIXME: validate destination address?
+          await Database.getInstance().setState(userId, withdrawalState);
+
+          const tokens = new Map();
+          tokens.set("amount", withdrawalState.amount);
+          tokens.set("destination", input);
+
+          return Telegram.getInstance().sendText(
+              userId,
+              Language.getString( "en", "withdrawal.confirm_text", tokens),
+              [
+                this._addKeyboardButton("en", "buttons.withdraw.confirm"),
+                this._addKeyboardButton("en", "buttons.withdraw.decline"),
+              ]
+          );
+        }
+      }
+
+      return "";
     }
 
     /**
@@ -170,17 +240,58 @@ export class Webhook {
       const section = data.slice(0, data.indexOf("."));
       const subject = data.slice(data.indexOf(".") + 1);
 
-      // TODO: improve, with more flows.
-      if (subject === "return") {
-        if (section === "help") {
+      if (section === "help") {
+        if (subject === "return") {
           return this.handleHelp(userId, chatId, messageId);
+        }
+      }
+
+      const user = await this.checkUser(userId);
+      if (!user) return "";
+
+      if (section === "withdraw") {
+        const state = await Database.getInstance()
+            .getState(userId) as WithdrawalState;
+
+        await Database.getInstance().clearState(userId);
+        if (subject === "confirm") {
+          if (!user.wallet) {
+            throw new Error("Got no wallet, should be impossible.");
+          }
+
+          if (!state.destinationAddress || !state.amount) {
+            throw new Error(
+                "Got invalid withdrawal state, should be impossible."
+            );
+          }
+
+          await Constellation.getInstance().transfer(
+              user.wallet, state.destinationAddress, state.amount
+          );
+
+          // FIXME: Balance is not yet updated, sleep a few seconds?
+          // Or just leave out the current balance..
+          const balance = await Constellation.getInstance()
+              .getBalance(user.wallet);
+
+          const tokens = new Map();
+          tokens.set("balance", balance);
+
+          // FIXME: return keyboard again.
+          return Telegram.getInstance().editMessage(
+              chatId, messageId,
+              Language.getString("en", "withdrawal.completed", tokens)
+          );
+        } else {
+          return Telegram.getInstance().editMessage(
+              chatId, messageId,
+              Language.getString("en", "withdrawal.canceled")
+          );
         }
       }
 
       if (section === "disclaimer") {
         if (subject === "accept") {
-          const user = await this.checkUser(userId);
-          if (!user) return "";
           user.acceptDisclaimer();
           await Database.getInstance().saveUser(userId, user);
           return Telegram.getInstance().editMessage(
@@ -217,7 +328,6 @@ export class Webhook {
 
       return user;
     }
-
 
     /**
      * Accept our disclaimer, and creates a new wallet for the user.

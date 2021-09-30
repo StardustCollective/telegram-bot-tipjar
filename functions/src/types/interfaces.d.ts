@@ -12,3 +12,14 @@ interface UserSchema {
     createdTS: number,
     updatedTS: number
 }
+
+interface State {
+    path: string,
+    section: string
+}
+
+interface WithdrawalState extends State {
+    balance: number,
+    amount?: number,
+    destinationAddress?: string
+}

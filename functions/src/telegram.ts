@@ -57,11 +57,12 @@ export class Telegram {
      * @param {string} chatId - The TG id of the receiver
      * @param {string} text - The text to be sent
      * @param {string} inlineKeyboard - (optional) an inline keyboard,
+     * @param {boolean} removeKeyboard - (optional) an inline keyboard,
      * to provide options in the chat.
      * @return {Promise}
      */
-    sendText(chatId: string, text: string, inlineKeyboard?: unknown[][]) :
-    Promise<string> {
+    sendText(chatId: string, text: string, inlineKeyboard?: unknown[][],
+        removeKeyboard?: boolean) : Promise<string> {
       const payload = {
         "chat_id": chatId,
         "parse_mode": "html",
@@ -72,6 +73,12 @@ export class Telegram {
       if (inlineKeyboard) {
         payload["reply_markup"] = {
           "inline_keyboard": inlineKeyboard,
+        };
+      }
+
+      if (removeKeyboard) {
+        payload["reply_markup"] = {
+          remove_keyboard: true,
         };
       }
       return this.callAPI("sendmessage", "post", JSON.stringify(payload));
@@ -91,6 +98,7 @@ export class Telegram {
       const payload = {
         "chat_id": chatId,
         "message_id": messageId,
+        "parse_mode": "html",
         "text": text,
         "reply_markup": {},
       };
@@ -117,6 +125,7 @@ export class Telegram {
       return this.callAPI("sendmessage", "post", JSON.stringify({
         "chat_id": chatId,
         "text": text,
+        "parse_mode": "html",
         "reply_markup": {
           keyboard: keyboard,
           one_time_keyboard: false,
