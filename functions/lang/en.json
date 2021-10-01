@@ -49,7 +49,7 @@
         "insufficient_balance": "The amount you entered is invalid, is higher than your current balance.",
         "invalid_destination": "The address <b>{{destination}}</b>, is <b>not a valid DAG wallet address</b>! Please check your input, and send the correct destination address again.",
         "confirm_text": "You are about to transfer <b>DAG {{amount}}</b> to <b>{{destination}}</b>, are you sure?",
-        "completed": "Transfer completed, your new balance is <b>DAG {{balance}}</b>.",
+        "completed": "Transfer completed!",
         "canceled": "You canceled the transfer.",
         "error": "Something went wrong with your transfer, nothing has been processed."
     }

@@ -77,10 +77,15 @@ export class Constellation {
         wallet: Wallet, destAddr : string, amount: number
     ) : Promise<void> {
       dag4.account.loginPrivateKey(wallet.privateKey);
-      const tx = await dag4.account.transferDag(destAddr, amount);
-      console.log(tx);
-      console.log(tx.hash);
-      // FIXME: return hash or something else to user?
-      // and test error
+      await dag4.account.transferDag(destAddr, amount);
+    }
+
+    /**
+     * Validates a given address at Constellation API.
+     * @param {string} address the address to validate
+     * @return {boolean} if the given address is valid.
+     */
+    validate(address : string) : boolean {
+      return dag4.keyStore.validateDagAddress(address);
     }
 }

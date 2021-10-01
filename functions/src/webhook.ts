@@ -173,9 +173,14 @@ export class Webhook {
               userId, Language.getString( "en", "withdrawal.destination_text")
           );
         } else if (withdrawalState.section === "destination") {
+          if (!Constellation.getInstance().validate(input)) {
+            return Telegram.getInstance().sendText(
+                userId, Language.getString( "en",
+                    "withdrawal.invalid_destination"
+                )
+            );
+          }
           withdrawalState.destinationAddress = input;
-
-          // FIXME: validate destination address?
           await Database.getInstance().setState(userId, withdrawalState);
 
           const tokens = new Map();
@@ -269,23 +274,18 @@ export class Webhook {
               user.wallet, state.destinationAddress, state.amount
           );
 
-          // FIXME: Balance is not yet updated, sleep a few seconds?
-          // Or just leave out the current balance..
-          const balance = await Constellation.getInstance()
-              .getBalance(user.wallet);
-
-          const tokens = new Map();
-          tokens.set("balance", balance);
-
-          // FIXME: return keyboard again.
           return Telegram.getInstance().editMessage(
               chatId, messageId,
-              Language.getString("en", "withdrawal.completed", tokens)
+              Language.getString("en", "withdrawal.completed"),
+              undefined,
+              this.DEFAULT_MENU
           );
         } else {
           return Telegram.getInstance().editMessage(
               chatId, messageId,
-              Language.getString("en", "withdrawal.canceled")
+              Language.getString("en", "withdrawal.canceled"),
+              undefined,
+              this.DEFAULT_MENU
           );
         }
       }

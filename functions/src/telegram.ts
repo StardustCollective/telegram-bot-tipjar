@@ -90,11 +90,13 @@ export class Telegram {
      * @param {string} messageId
      * @param {string} text
      * @param {string} inlineKeyboard - (optional) an inline keyboard,
+     * @param {string} keyboard - (optional) send a normal keyboard
      * to provide options in the chat.
      * @return {Promise}
      */
     editMessage(chatId: string, messageId: string, text: string,
-        inlineKeyboard?: unknown[][]) : Promise<string> {
+        inlineKeyboard?: unknown[][], keyboard?: unknown[][])
+        : Promise<string> {
       const payload = {
         "chat_id": chatId,
         "message_id": messageId,
@@ -105,6 +107,13 @@ export class Telegram {
 
       if (inlineKeyboard) {
         payload["reply_markup"] = {inline_keyboard: inlineKeyboard};
+      }
+      if (keyboard) {
+        payload["reply_markup"] = {
+          keyboard: keyboard,
+          one_time_keyboard: false,
+          resize_keyboard: true,
+        };
       }
       return this.callAPI("editMessageText", "post",
           JSON.stringify(payload)
