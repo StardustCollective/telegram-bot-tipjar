@@ -8,10 +8,10 @@ import {Telegram} from "./telegram";
  * Class for handling all webhook calls.
  */
 export class Webhook {
-    DEFAULT_MENU = [
+    DEFAULT_KEYBOARD = {inline: false, keys: [
       [{text: "👛 Balance"}, {text: "🏦 Deposit"}],
       [{text: "🦮 Withdraw"}, {text: "🆘 Help"}],
-    ];
+    ]};
 
     /**
      * Handle the /start command.
@@ -42,8 +42,8 @@ export class Webhook {
           "en", "welcome", tokens
       );
 
-      return Telegram.getInstance().sendKeyboard(
-          userId, text, this.DEFAULT_MENU
+      return Telegram.getInstance().sendText(
+          userId, text, this.DEFAULT_KEYBOARD
       );
     }
 
@@ -60,7 +60,7 @@ export class Webhook {
           .getBalance(user.wallet);
 
       const tokens = new Map();
-      tokens.set("balance", balance);
+      tokens.set("balance", balance * 1e-8);
       return Telegram.getInstance().sendText(userId,
           Language.getString( "en", "balance.text", tokens )
       );
@@ -75,10 +75,10 @@ export class Webhook {
       return Telegram.getInstance().sendText(
           userId,
           Language.getString( "en", "help.disclaimer"),
-          [
+          {inline: true, keys: [
             this._addKeyboardButton("en", "buttons.disclaimer.accept"),
             this._addKeyboardButton("en", "buttons.disclaimer.decline"),
-          ]
+          ]}
       );
     }
 
@@ -113,7 +113,7 @@ export class Webhook {
           .getBalance(user.wallet);
 
       const tokens = new Map();
-      tokens.set("balance", balance);
+      tokens.set("balance", balance * 1e-8);
       await Database.getInstance().setState(
           userId, {path: "withdrawal", section: "amount", balance: balance}
       );
@@ -127,18 +127,19 @@ export class Webhook {
      *
      * @param {string} language the language to use
      * @param {string} path the path of translation
-     * @return {Array} a TG formatted keyboard button
+     * @return {TelegramKeyboardButton} a TG formatted keyboard button
      */
     _addKeyboardButton(language :string, path :string)
-        : Array<Record<string, string>> {
+        : TelegramKeyboardButton {
       return [{
-        "text": Language.getString(language, path),
-        "callback_data": path,
+        text: Language.getString(language, path),
+        callback_data: path,
       }];
     }
 
     /**
-     * Handles input from withdrawal flow, could be expanded to more later.
+     * Handles default input, for now mainly withdrawal flow,
+     * could be expanded to more later.
      * @param {string} userId the telegram user id
      * @param {string} input whatever the user input
      * @return {Promise}
@@ -152,8 +153,6 @@ export class Webhook {
 
       if (state.path === "withdrawal") {
         const withdrawalState = state as WithdrawalState;
-        console.log(withdrawalState);
-        console.log(input);
         if (withdrawalState.section === "amount") {
           withdrawalState.amount = parseInt(input, 10);
           if (!withdrawalState.amount || isNaN(withdrawalState.amount)) {
@@ -190,10 +189,10 @@ export class Webhook {
           return Telegram.getInstance().sendText(
               userId,
               Language.getString( "en", "withdrawal.confirm_text", tokens),
-              [
+              {inline: true, keys: [
                 this._addKeyboardButton("en", "buttons.withdraw.confirm"),
                 this._addKeyboardButton("en", "buttons.withdraw.decline"),
-              ]
+              ]}
           );
         }
       }
@@ -210,14 +209,14 @@ export class Webhook {
     handleHelp(userId: string, chatId?: string, messageId?: string) :
     Promise<string> {
       const text = Language.getString( "en", "help.title");
-      const inlineKeyboard = [
+      const inlineKeyboard = {inline: true, keys: [
         this._addKeyboardButton("en", "buttons.help.get_started"),
         this._addKeyboardButton("en", "buttons.help.disclaimer"),
         this._addKeyboardButton("en", "buttons.help.how_to_deposit"),
         this._addKeyboardButton("en", "buttons.help.how_to_withdrawal"),
         this._addKeyboardButton("en", "buttons.help.how_to_check_balance"),
         this._addKeyboardButton("en", "buttons.help.about_us"),
-      ];
+      ]};
 
       if (chatId && messageId) {
         return Telegram.getInstance().editMessage(
@@ -277,15 +276,13 @@ export class Webhook {
           return Telegram.getInstance().editMessage(
               chatId, messageId,
               Language.getString("en", "withdrawal.completed"),
-              undefined,
-              this.DEFAULT_MENU
+              this.DEFAULT_KEYBOARD
           );
         } else {
           return Telegram.getInstance().editMessage(
               chatId, messageId,
               Language.getString("en", "withdrawal.canceled"),
-              undefined,
-              this.DEFAULT_MENU
+              this.DEFAULT_KEYBOARD
           );
         }
       }
@@ -306,9 +303,9 @@ export class Webhook {
 
       return Telegram.getInstance().editMessage(
           chatId, messageId, Language.getString("en", `${section}.${subject}`),
-          [
+          {inline: true, keys: [
             this._addKeyboardButton("en", `${section}.return`),
-          ]
+          ]}
       );
     }
 

@@ -23,3 +23,15 @@ interface WithdrawalState extends State {
     amount?: number,
     destinationAddress?: string
 }
+interface TelegramKeyboardButtonInt {
+    text: string,
+    // TG API needs like this, so ignore eslint.
+    // eslint-disable-next-line camelcase
+    callback_data?: string,
+}
+
+type TelegramKeyboardButton = Array<TelegramKeyboardButtonInt>
+interface TelegramKeyboard {
+    inline: boolean,
+    keys: Array<TelegramKeyboardButton>
+}
