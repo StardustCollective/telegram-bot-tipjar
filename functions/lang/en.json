@@ -24,11 +24,14 @@
         "how_to_check_balance": "click the balance button  (TODO)",
         "about_us": "We are from constellation (TODO)"
     },
-    "help-get_started": "To get started using this bot;\r\n\r\n(TODO)",
+    "errors": {
+        "wallet_not_found": "Cannot find your wallet, run /start to setup your wallet."
+    },
     "balance": {
         "text": "These are your balance and current daily limits.\r\n\r\n<b>Your current balance</b>:\r\nDAG {{balance}}"
     },
     "disclaimer": {
+        "pending": "You did not accept our disclaimer yet, please do so before using this feature.",
         "finished": "Yay, your wallet is created! Deposit some DAG into your wallet with /deposit 🥰",
         "declined": "Okay, no worries. If you change your mind, you know where to find us 😎"
     },

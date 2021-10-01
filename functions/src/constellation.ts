@@ -15,21 +15,12 @@ export class Constellation {
    * @constructor
    */
     constructor() {
-      if (config().env.production) {
-      // MAIN_NET
-        dag4.network.config({
-          id: "main",
-          beUrl: "https://block-explorer.constellationnetwork.io",
-          lbUrl: "http://lb.constellationnetwork.io:9000",
-        });
-      } else {
-        // TESTNET
-        dag4.network.config({
-          id: "ceres",
-          beUrl: "https://api-be.exchanges.constellationnetwork.io",
-          lbUrl: "http://lb.exchanges.constellationnetwork.io:9000",
-        });
-      }
+      dag4.network.config({
+        id: config().dag_network.id,
+        beUrl: config().dag_network.beUrl,
+        lbUrl: config().dag_network.lbUrl,
+      });
+
       dag4.di.useFetchHttpClient(fetch);
 
       this.libURL = dag4.network.getNetwork().lbUrl;

@@ -209,11 +209,8 @@ export class Webhook {
     private async checkUser(userId: string) : Promise<DBUser | null> {
       const user = await Database.getInstance().getUser(userId);
       if (!user || !user.wallet) {
-        // FIXME: what we do here? user does not exist,
-        // which should not happen..
-        // could just create the user and continue?
         await Telegram.getInstance().sendText(userId,
-            "Cannot find your wallet, run /start to setup your wallet."
+            Language.getString("en", "errors.wallet_not_found")
         );
         return null;
       }
@@ -231,11 +228,10 @@ export class Webhook {
     private async checkDisclaimer(userId: string, user: DBUser)
         : Promise<boolean> {
       if (!user.acceptedDisclaimer) {
-        // FIXME: better text/flow?
         await Telegram.getInstance().sendText(userId,
-            "You did not accept our disclaimer yet, " +
-              "run /disclaimer to do so now."
+            Language.getString("en", "disclaimer.pending")
         );
+        await this.handleDisclaimer(userId);
         return false;
       }
 
