@@ -63,6 +63,29 @@ export class Constellation {
           .getAddressBalance(wallet.address);
 
       if (!result || !result.balance) return 0;
-      return result.balance * 1e-8;
+      return result.balance;
+    }
+
+    /**
+     * Transfer amount from wallet to destination address.
+     *
+     * @param {Wallet} wallet source wallet
+     * @param {string} destAddr the destination address
+     * @param {number} amount the amount to transfer
+     */
+    async transfer(
+        wallet: Wallet, destAddr : string, amount: number
+    ) : Promise<void> {
+      dag4.account.loginPrivateKey(wallet.privateKey);
+      await dag4.account.transferDag(destAddr, amount);
+    }
+
+    /**
+     * Validates a given address at Constellation API.
+     * @param {string} address the address to validate
+     * @return {boolean} if the given address is valid.
+     */
+    validate(address : string) : boolean {
+      return dag4.keyStore.validateDagAddress(address);
     }
 }

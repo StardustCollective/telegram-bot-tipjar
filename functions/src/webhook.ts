@@ -8,10 +8,10 @@ import {Telegram} from "./telegram";
  * Class for handling all webhook calls.
  */
 export class Webhook {
-    DEFAULT_MENU = [
+    DEFAULT_KEYBOARD = {inline: false, keys: [
       [{text: "👛 Balance"}, {text: "🏦 Deposit"}],
       [{text: "🦮 Withdraw"}, {text: "🆘 Help"}],
-    ];
+    ]};
 
     /**
      * Handle the /start command.
@@ -42,8 +42,8 @@ export class Webhook {
           "en", "welcome", tokens
       );
 
-      return Telegram.getInstance().sendKeyboard(
-          userId, text, this.DEFAULT_MENU
+      return Telegram.getInstance().sendText(
+          userId, text, this.DEFAULT_KEYBOARD
       );
     }
 
@@ -60,7 +60,7 @@ export class Webhook {
           .getBalance(user.wallet);
 
       const tokens = new Map();
-      tokens.set("balance", balance);
+      tokens.set("balance", balance * 1e-8);
       return Telegram.getInstance().sendText(userId,
           Language.getString( "en", "balance.text", tokens )
       );
@@ -75,10 +75,10 @@ export class Webhook {
       return Telegram.getInstance().sendText(
           userId,
           Language.getString( "en", "help.disclaimer"),
-          [
+          {inline: true, keys: [
             this._addKeyboardButton("en", "buttons.disclaimer.accept"),
             this._addKeyboardButton("en", "buttons.disclaimer.decline"),
-          ]
+          ]}
       );
     }
 
@@ -106,24 +106,98 @@ export class Webhook {
      */
     async handleWithdrawal(userId: string) : Promise<string> {
       const user = await this.checkUser(userId);
-      if (!user) return "";
+      if (!user || !user.wallet) return "";
       if (!await this.checkDisclaimer(userId, user)) return "";
 
-      return Telegram.getInstance().sendText(userId, "TODO");
+      const balance = await Constellation.getInstance()
+          .getBalance(user.wallet);
+
+      const tokens = new Map();
+      tokens.set("balance", balance * 1e-8);
+      await Database.getInstance().setState(
+          userId, {path: "withdrawal", section: "amount", balance: balance}
+      );
+      return Telegram.getInstance().sendText(
+          userId, Language.getString( "en", "withdrawal.text", tokens),
+          undefined, true
+      );
     }
 
     /**
      *
      * @param {string} language the language to use
      * @param {string} path the path of translation
-     * @return {Array} a TG formatted keyboard button
+     * @return {TelegramKeyboardButton} a TG formatted keyboard button
      */
     _addKeyboardButton(language :string, path :string)
-        : Array<Record<string, string>> {
+        : TelegramKeyboardButton {
       return [{
-        "text": Language.getString(language, path),
-        "callback_data": path,
+        text: Language.getString(language, path),
+        callback_data: path,
       }];
+    }
+
+    /**
+     * Handles default input, for now mainly withdrawal flow,
+     * could be expanded to more later.
+     * @param {string} userId the telegram user id
+     * @param {string} input whatever the user input
+     * @return {Promise}
+     */
+    async handleDefault(userId: string, input: string) : Promise<string> {
+      const user = await this.checkUser(userId);
+      if (!user || !user.wallet) return "";
+
+      const state = await Database.getInstance().getState(userId);
+      if (!state) return "";
+
+      if (state.path === "withdrawal") {
+        const withdrawalState = state as WithdrawalState;
+        if (withdrawalState.section === "amount") {
+          withdrawalState.amount = parseInt(input, 10);
+          if (!withdrawalState.amount || isNaN(withdrawalState.amount)) {
+            return Telegram.getInstance().sendText(
+                userId, Language.getString( "en", "withdrawal.invalid_amount")
+            );
+          } else if (withdrawalState.amount > withdrawalState.balance) {
+            return Telegram.getInstance().sendText(
+                userId, Language.getString( "en",
+                    "withdrawal.insufficient_balance"
+                )
+            );
+          }
+          withdrawalState.section = "destination";
+          await Database.getInstance().setState(userId, withdrawalState);
+          return Telegram.getInstance().sendText(
+              userId, Language.getString( "en", "withdrawal.destination_text")
+          );
+        } else if (withdrawalState.section === "destination") {
+          if (!Constellation.getInstance().validate(input)) {
+            return Telegram.getInstance().sendText(
+                userId, Language.getString( "en",
+                    "withdrawal.invalid_destination"
+                )
+            );
+          }
+          withdrawalState.destinationAddress = input;
+          await Database.getInstance().setState(userId, withdrawalState);
+
+          const tokens = new Map();
+          tokens.set("amount", withdrawalState.amount);
+          tokens.set("destination", input);
+
+          return Telegram.getInstance().sendText(
+              userId,
+              Language.getString( "en", "withdrawal.confirm_text", tokens),
+              {inline: true, keys: [
+                this._addKeyboardButton("en", "buttons.withdraw.confirm"),
+                this._addKeyboardButton("en", "buttons.withdraw.decline"),
+              ]}
+          );
+        }
+      }
+
+      return "";
     }
 
     /**
@@ -135,14 +209,14 @@ export class Webhook {
     handleHelp(userId: string, chatId?: string, messageId?: string) :
     Promise<string> {
       const text = Language.getString( "en", "help.title");
-      const inlineKeyboard = [
+      const inlineKeyboard = {inline: true, keys: [
         this._addKeyboardButton("en", "buttons.help.get_started"),
         this._addKeyboardButton("en", "buttons.help.disclaimer"),
         this._addKeyboardButton("en", "buttons.help.how_to_deposit"),
         this._addKeyboardButton("en", "buttons.help.how_to_withdrawal"),
         this._addKeyboardButton("en", "buttons.help.how_to_check_balance"),
         this._addKeyboardButton("en", "buttons.help.about_us"),
-      ];
+      ]};
 
       if (chatId && messageId) {
         return Telegram.getInstance().editMessage(
@@ -170,17 +244,51 @@ export class Webhook {
       const section = data.slice(0, data.indexOf("."));
       const subject = data.slice(data.indexOf(".") + 1);
 
-      // TODO: improve, with more flows.
-      if (subject === "return") {
-        if (section === "help") {
+      if (section === "help") {
+        if (subject === "return") {
           return this.handleHelp(userId, chatId, messageId);
+        }
+      }
+
+      const user = await this.checkUser(userId);
+      if (!user) return "";
+
+      if (section === "withdraw") {
+        const state = await Database.getInstance()
+            .getState(userId) as WithdrawalState;
+
+        await Database.getInstance().clearState(userId);
+        if (subject === "confirm") {
+          if (!user.wallet) {
+            throw new Error("Got no wallet, should be impossible.");
+          }
+
+          if (!state.destinationAddress || !state.amount) {
+            throw new Error(
+                "Got invalid withdrawal state, should be impossible."
+            );
+          }
+
+          await Constellation.getInstance().transfer(
+              user.wallet, state.destinationAddress, state.amount
+          );
+
+          return Telegram.getInstance().editMessage(
+              chatId, messageId,
+              Language.getString("en", "withdrawal.completed"),
+              this.DEFAULT_KEYBOARD
+          );
+        } else {
+          return Telegram.getInstance().editMessage(
+              chatId, messageId,
+              Language.getString("en", "withdrawal.canceled"),
+              this.DEFAULT_KEYBOARD
+          );
         }
       }
 
       if (section === "disclaimer") {
         if (subject === "accept") {
-          const user = await this.checkUser(userId);
-          if (!user) return "";
           user.acceptDisclaimer();
           await Database.getInstance().saveUser(userId, user);
           return Telegram.getInstance().editMessage(
@@ -195,9 +303,9 @@ export class Webhook {
 
       return Telegram.getInstance().editMessage(
           chatId, messageId, Language.getString("en", `${section}.${subject}`),
-          [
+          {inline: true, keys: [
             this._addKeyboardButton("en", `${section}.return`),
-          ]
+          ]}
       );
     }
 
@@ -217,7 +325,6 @@ export class Webhook {
 
       return user;
     }
-
 
     /**
      * Accept our disclaimer, and creates a new wallet for the user.

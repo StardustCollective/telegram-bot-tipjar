@@ -66,4 +66,39 @@ export class Database {
     user.updatedTS = new Date().getTime();
     return database().ref(`users/${userID}`).update(user);
   }
+
+  /**
+   *
+   * @param {string} userID - telegram user id
+   * @param {string} path - telegram user id
+   * @return {Promise}
+   */
+  async getState(userID : string) : Promise<State | WithdrawalState> {
+    const snapshot = await database().ref(`state/${userID}`)
+        .once("value", (snapshot) => snapshot);
+
+    return snapshot.val();
+  }
+
+  /**
+   *
+   * @param {string} userID - telegram user id
+   * @param {string} state - State object
+   * @param {any} payload - extra payload for state
+   * @return {Promise}
+   */
+  setState(userID : string, state : State | WithdrawalState) : Promise<void> {
+    return database().ref(`state/${userID}`).update(state);
+  }
+
+  /**
+   *
+   * @param {string} userID - telegram user id
+   * @param {string} state - State object
+   * @param {any} payload - extra payload for state
+   * @return {Promise}
+   */
+  clearState(userID : string) : Promise<void> {
+    return database().ref(`state/${userID}`).remove();
+  }
 }

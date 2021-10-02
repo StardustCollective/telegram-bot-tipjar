@@ -12,6 +12,10 @@
         "disclaimer": {
             "accept": "Yes, I agree with the above.",
             "decline": "No, I don't agree with the above disclaimer."
+        },
+        "withdraw": {
+            "confirm": "Yes, start transfer.",
+            "decline": "No, start over."
         }
     },
     "help": {
@@ -28,7 +32,7 @@
         "wallet_not_found": "Cannot find your wallet, run /start to setup your wallet."
     },
     "balance": {
-        "text": "These are your balance and current daily limits.\r\n\r\n<b>Your current balance</b>:\r\nDAG {{balance}}"
+        "text": "<b>Your current balance</b>:\r\nDAG {{balance}}"
     },
     "disclaimer": {
         "pending": "You did not accept our disclaimer yet, please do so before using this feature.",
@@ -37,5 +41,16 @@
     },
     "deposit": {
         "text": "Please send your DAG deposit to:\r\n\r\n<b>{{wallet_address}}</b>\r\n\r\nThis address is unique to you and all DAG deposited to this address will be credited to your DAGBot wallet."
+    },
+    "withdrawal": {
+        "text": "Your current balance is <b>DAG {{balance}}</b>.\r\n\r\nHow much do you want to withdraw from your wallet?",
+        "destination_text": "Please enter the address of the destination wallet.",
+        "invalid_amount": "The amount you entered is invalid, please check your input and try again.",
+        "insufficient_balance": "The amount you entered is invalid, is higher than your current balance.",
+        "invalid_destination": "The address <b>{{destination}}</b>, is <b>not a valid DAG wallet address</b>! Please check your input, and send the correct destination address again.",
+        "confirm_text": "You are about to transfer <b>DAG {{amount}}</b> to <b>{{destination}}</b>, are you sure?",
+        "completed": "Transfer completed!",
+        "canceled": "You canceled the transfer.",
+        "error": "Something went wrong with your transfer, nothing has been processed."
     }
 }

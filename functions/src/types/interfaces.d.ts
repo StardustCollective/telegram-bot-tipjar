@@ -12,3 +12,26 @@ interface UserSchema {
     createdTS: number,
     updatedTS: number
 }
+
+interface State {
+    path: string,
+    section: string
+}
+
+interface WithdrawalState extends State {
+    balance: number,
+    amount?: number,
+    destinationAddress?: string
+}
+interface TelegramKeyboardButtonInt {
+    text: string,
+    // TG API needs like this, so ignore eslint.
+    // eslint-disable-next-line camelcase
+    callback_data?: string,
+}
+
+type TelegramKeyboardButton = Array<TelegramKeyboardButtonInt>
+interface TelegramKeyboard {
+    inline: boolean,
+    keys: Array<TelegramKeyboardButton>
+}

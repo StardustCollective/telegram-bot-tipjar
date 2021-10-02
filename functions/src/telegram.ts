@@ -56,12 +56,16 @@ export class Telegram {
      *
      * @param {string} chatId - The TG id of the receiver
      * @param {string} text - The text to be sent
-     * @param {string} inlineKeyboard - (optional) an inline keyboard,
+     * @param {TelegramKeyboard} keyboard - (optional) a TG keyboard,
+     * @param {boolean} removeKeyboard - (optional) an inline keyboard,
      * to provide options in the chat.
      * @return {Promise}
      */
-    sendText(chatId: string, text: string, inlineKeyboard?: unknown[][]) :
-    Promise<string> {
+    sendText(
+        chatId: string, text: string,
+        keyboard?: TelegramKeyboard,
+        removeKeyboard?: boolean
+    ) : Promise<string> {
       const payload = {
         "chat_id": chatId,
         "parse_mode": "html",
@@ -69,9 +73,21 @@ export class Telegram {
         "reply_markup": {},
       };
 
-      if (inlineKeyboard) {
+      if (keyboard) {
+        if (keyboard.inline) {
+          payload["reply_markup"] = {
+            inline_keyboard: keyboard.keys,
+          };
+        } else {
+          payload["reply_markup"] = {
+            keyboard: keyboard.keys,
+            one_time_keyboard: false,
+            resize_keyboard: true,
+          };
+        }
+      } else if (removeKeyboard) {
         payload["reply_markup"] = {
-          "inline_keyboard": inlineKeyboard,
+          remove_keyboard: true,
         };
       }
       return this.callAPI("sendmessage", "post", JSON.stringify(payload));
@@ -82,46 +98,36 @@ export class Telegram {
      * @param {string} chatId
      * @param {string} messageId
      * @param {string} text
-     * @param {string} inlineKeyboard - (optional) an inline keyboard,
+     * @param {TelegramKeyboard} keyboard - (optional) send a TG keyboard
      * to provide options in the chat.
      * @return {Promise}
      */
     editMessage(chatId: string, messageId: string, text: string,
-        inlineKeyboard?: unknown[][]) : Promise<string> {
+        keyboard?: TelegramKeyboard)
+        : Promise<string> {
       const payload = {
         "chat_id": chatId,
         "message_id": messageId,
+        "parse_mode": "html",
         "text": text,
         "reply_markup": {},
       };
 
-      if (inlineKeyboard) {
-        payload["reply_markup"] = {inline_keyboard: inlineKeyboard};
+      if (keyboard) {
+        if (keyboard.inline) {
+          payload["reply_markup"] = {
+            inline_keyboard: keyboard.keys,
+          };
+        } else {
+          payload["reply_markup"] = {
+            keyboard: keyboard.keys,
+            one_time_keyboard: false,
+            resize_keyboard: true,
+          };
+        }
       }
       return this.callAPI("editMessageText", "post",
           JSON.stringify(payload)
       );
-    }
-
-    /**
-     * Sends a TG keyboard to the user.
-     *
-     * @param {string} chatId - The TG id of the receiver
-     * @param {string} text - The text to be sent
-     * @param {string} keyboard - The TG keyboard structure
-     * @return {Promise}
-     */
-    sendKeyboard(
-        chatId: string, text: string, keyboard: unknown[][]
-    ): Promise<string> {
-      return this.callAPI("sendmessage", "post", JSON.stringify({
-        "chat_id": chatId,
-        "text": text,
-        "reply_markup": {
-          keyboard: keyboard,
-          one_time_keyboard: false,
-          resize_keyboard: true,
-        },
-      }));
     }
 }
