@@ -14,7 +14,7 @@ export class Database {
    */
   constructor() {
     if (config().env.production) {
-      initializeApp({databaseURL: config().env.databaseURL});
+      initializeApp({databaseURL: config().env.database_url});
     } else {
       initializeApp();
     }

@@ -17,8 +17,8 @@ export class Constellation {
     constructor() {
       dag4.network.config({
         id: config().dag_network.id,
-        beUrl: config().dag_network.beUrl,
-        lbUrl: config().dag_network.lbUrl,
+        beUrl: config().dag_network.be_url,
+        lbUrl: config().dag_network.lb_url,
       });
 
       dag4.di.useFetchHttpClient(fetch);
