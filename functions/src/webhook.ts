@@ -1,4 +1,6 @@
+import {Constellation} from "./constellation";
 import {Database} from "./database";
+import {DBUser} from "./user";
 import {Language} from "./language";
 import {Telegram} from "./telegram";
 
@@ -13,45 +15,101 @@ export class Webhook {
 
     /**
      * Handle the /start command.
-     * @param {string} tgUserId - telegram user id
-     * @param {string} tgUsername - telegram username
+     * @param {string} userId - telegram user id
+     * @param {string} username - telegram username
      * @return {Promise}
      */
-    async handleStart(tgUserId: string, tgUsername :string) : Promise<string> {
-      await Database.getInstance().createOrUpdateUser(tgUserId, tgUsername);
+    async handleStart(userId: string, username :string) : Promise<string> {
+      let user = await Database.getInstance().getUser(userId);
+      if (!user) {
+        user = await Database.getInstance().createUser(userId, username);
+      }
+      // Always keep username up to date in DB.
+      if (user.username !== username) {
+        user.username = username;
+        await Database.getInstance().saveUser(userId, user);
+      }
+      if (!user.wallet) {
+        const wallet = await Constellation.getInstance().createWallet();
+        user.wallet = wallet;
+        user.updatedTS = new Date().getTime();
+        await Database.getInstance().saveUser(userId, user);
+      }
+
       const tokens = new Map();
-      tokens.set("username", tgUsername);
+      tokens.set("username", username);
       const text = Language.getString(
           "en", "welcome", tokens
       );
 
       return Telegram.getInstance().sendKeyboard(
-          tgUserId, text, this.DEFAULT_MENU
+          userId, text, this.DEFAULT_MENU
       );
     }
 
     /**
-     * @param {string} tgUserId - telegram user id
+     * @param {string} userId - telegram user id
      * @return {Promise}
      */
-    handleBalance(tgUserId: string) : Promise<string> {
-      return Telegram.getInstance().sendText(tgUserId, "TODO");
+    async handleBalance(userId: string) :
+        Promise<string> {
+      const user = await this.checkUser(userId);
+      if (!user || !user.wallet) return "";
+
+      const balance = await Constellation.getInstance()
+          .getBalance(user.wallet);
+
+      const tokens = new Map();
+      tokens.set("balance", balance);
+      return Telegram.getInstance().sendText(userId,
+          Language.getString( "en", "balance.text", tokens )
+      );
     }
 
     /**
-     * @param {string} tgUserId - telegram user id
+     * Show the disclaimer, with accept/decline buttons.
+     * @param {string} userId - telegram userID
+     * @return {Promise}
+     */
+    async handleDisclaimer(userId: string) : Promise<string> {
+      return Telegram.getInstance().sendText(
+          userId,
+          Language.getString( "en", "help.disclaimer"),
+          [
+            this._addKeyboardButton("en", "buttons.disclaimer.accept"),
+            this._addKeyboardButton("en", "buttons.disclaimer.decline"),
+          ]
+      );
+    }
+
+    /**
+     * @param {string} userId - telegram user id
      * @return {Promise}
     */
-    handleDeposit(tgUserId: string) : Promise<string> {
-      return Telegram.getInstance().sendText(tgUserId, "TODO");
+    async handleDeposit(userId: string) : Promise<string> {
+      const user = await this.checkUser(userId);
+      if (!user || !user.wallet) return "";
+      if (!await this.checkDisclaimer(userId, user)) return "";
+
+      const tokens = new Map();
+      tokens.set("wallet_address", user.wallet.address);
+
+      return Telegram.getInstance().sendText(
+          userId,
+          Language.getString( "en", "deposit.text", tokens),
+      );
     }
 
     /**
-     * @param {string} tgUserId - telegram user id
+     * @param {string} userId - telegram user id
      * @return {Promise}
      */
-    handleWithdrawal(tgUserId: string) : Promise<string> {
-      return Telegram.getInstance().sendText(tgUserId, "TODO");
+    async handleWithdrawal(userId: string) : Promise<string> {
+      const user = await this.checkUser(userId);
+      if (!user) return "";
+      if (!await this.checkDisclaimer(userId, user)) return "";
+
+      return Telegram.getInstance().sendText(userId, "TODO");
     }
 
     /**
@@ -69,12 +127,12 @@ export class Webhook {
     }
 
     /**
-     * @param {string} tgUserId - telegram user id
+     * @param {string} userId - telegram user id
      * @param {string} chatId - if previous message should be edited.
      * @param {string} messageId - if previous message should be edited.
      * @return {Promise}
      */
-    handleHelp(tgUserId: string, chatId?: string, messageId?: string) :
+    handleHelp(userId: string, chatId?: string, messageId?: string) :
     Promise<string> {
       const text = Language.getString( "en", "help.title");
       const inlineKeyboard = [
@@ -93,20 +151,20 @@ export class Webhook {
       }
 
       return Telegram.getInstance().sendText(
-          tgUserId, text, inlineKeyboard
+          userId, text, inlineKeyboard
       );
     }
 
     /**
      *
-     * @param {string} tgUserId
+     * @param {string} userId
      * @param {string} chatId
      * @param {string} messageId
      * @param {string} data
      * @return {Prromise}
      */
-    handleCallbackQuery(
-        tgUserId: string, chatId: string, messageId: string, data: string
+    async handleCallbackQuery(
+        userId: string, chatId: string, messageId: string, data: string
     ) : Promise<string> {
       data = data.replace("buttons.", "");
       const section = data.slice(0, data.indexOf("."));
@@ -115,7 +173,23 @@ export class Webhook {
       // TODO: improve, with more flows.
       if (subject === "return") {
         if (section === "help") {
-          return this.handleHelp(tgUserId, chatId, messageId);
+          return this.handleHelp(userId, chatId, messageId);
+        }
+      }
+
+      if (section === "disclaimer") {
+        if (subject === "accept") {
+          const user = await this.checkUser(userId);
+          if (!user) return "";
+          user.acceptDisclaimer();
+          await Database.getInstance().saveUser(userId, user);
+          return Telegram.getInstance().editMessage(
+              chatId, messageId, Language.getString("en", "disclaimer.finished")
+          );
+        } else {
+          return Telegram.getInstance().editMessage(
+              chatId, messageId, Language.getString("en", "disclaimer.declined")
+          );
         }
       }
 
@@ -125,5 +199,42 @@ export class Webhook {
             this._addKeyboardButton("en", `${section}.return`),
           ]
       );
+    }
+
+    /**
+     * Accept our disclaimer, and creates a new wallet for the user.
+     * @param {string} userId - telegram userID
+     * @return {Promise}
+     */
+    private async checkUser(userId: string) : Promise<DBUser | null> {
+      const user = await Database.getInstance().getUser(userId);
+      if (!user || !user.wallet) {
+        await Telegram.getInstance().sendText(userId,
+            Language.getString("en", "errors.wallet_not_found")
+        );
+        return null;
+      }
+
+      return user;
+    }
+
+
+    /**
+     * Accept our disclaimer, and creates a new wallet for the user.
+     * @param {string} userId - telegram userID
+     * @param {any} user - db user
+     * @return {Promise}
+     */
+    private async checkDisclaimer(userId: string, user: DBUser)
+        : Promise<boolean> {
+      if (!user.acceptedDisclaimer) {
+        await Telegram.getInstance().sendText(userId,
+            Language.getString("en", "disclaimer.pending")
+        );
+        await this.handleDisclaimer(userId);
+        return false;
+      }
+
+      return true;
     }
 }

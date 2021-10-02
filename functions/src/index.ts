@@ -47,6 +47,8 @@ exports.handleUpdate = https.onRequest(async (req, res): Promise<any> => {
       case "/help":
       case "🆘 Help":
         await webhook.handleHelp(tgUserId); break;
+      case "/disclaimer":
+        await webhook.handleDisclaimer(tgUserId); break;
       default:
         return res.status(200).send();
     }
