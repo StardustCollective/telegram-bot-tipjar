@@ -10,8 +10,6 @@
     "target": "es2017",
     "typeRoots": [
         "src/types",
-        "./node_modules/@types",
-        "./node_modules/@firebase/database-types"
       ]
   },
   "compileOnSave": true,

@@ -1,5 +1,5 @@
+import * as fb from "firebase-admin";
 import {config} from "firebase-functions";
-import {database, initializeApp} from "firebase-admin";
 import {DataSnapshot} from "@firebase/database-types";
 import {DBUser} from "./user";
 
@@ -14,9 +14,9 @@ export class Database {
    */
   constructor() {
     if (config().env.production) {
-      initializeApp({databaseURL: config().env.database_url});
+      fb.initializeApp({databaseURL: config().env.database_url});
     } else {
-      initializeApp();
+      fb.initializeApp();
     }
   }
 
@@ -39,7 +39,7 @@ export class Database {
   */
   async createUser(userID: string, username: string): Promise<DBUser> {
     const user = new DBUser(username);
-    await database().ref(`users/${userID}`).set(user);
+    await fb.database().ref(`users/${userID}`).set(user);
     return user;
   }
 
@@ -49,7 +49,7 @@ export class Database {
   * @return {Promise} returns DB
   */
   async getUser(userID: string): Promise<DBUser | null> {
-    const snapshot = await database().ref(`users/${userID}`)
+    const snapshot = await fb.database().ref(`users/${userID}`)
         .once("value", (snapshot) => snapshot);
 
     return DBUser.fromSnapshot(snapshot);
@@ -64,7 +64,7 @@ export class Database {
   saveUser(userID : string, user: DBUser): Promise<DataSnapshot> {
     if (!userID) throw new Error("UserID cannot be empty!");
     user.updatedTS = new Date().getTime();
-    return database().ref(`users/${userID}`).update(user);
+    return fb.database().ref(`users/${userID}`).update(user);
   }
 
   /**
@@ -74,7 +74,7 @@ export class Database {
    * @return {Promise}
    */
   async getState(userID : string) : Promise<State | WithdrawalState> {
-    const snapshot = await database().ref(`state/${userID}`)
+    const snapshot = await fb.database().ref(`state/${userID}`)
         .once("value", (snapshot) => snapshot);
 
     return snapshot.val();
@@ -88,7 +88,7 @@ export class Database {
    * @return {Promise}
    */
   setState(userID : string, state : State | WithdrawalState) : Promise<void> {
-    return database().ref(`state/${userID}`).update(state);
+    return fb.database().ref(`state/${userID}`).update(state);
   }
 
   /**
@@ -99,6 +99,6 @@ export class Database {
    * @return {Promise}
    */
   clearState(userID : string) : Promise<void> {
-    return database().ref(`state/${userID}`).remove();
+    return fb.database().ref(`state/${userID}`).remove();
   }
 }
