@@ -22,7 +22,7 @@
         "title": "Choose a topic below, to learn more about it.",
         "return": "Return",
         "get_started": "getting started (TODO)",
-        "disclaimer": "this is the disclaime (TODO)",
+        "disclaimer": "This program “DAGBot” is a work in progress, and as such provided on an as is basis. The developer and team behind DAGBot (collectively 'Stardust Collective') make no guarantees in terms of financial gain/loss, cybersecurity or otherwise that DAGBot will be error or risk-free, function as desired or without disruptions or imperfections.\r\n\r\nBy using DAGBot, you agree to hold harmless Stardust Collective and DAGBot without limitation up to and including total financial loss. Stardust Collective assumes no liability, and you, as the user, agree not to seek indemnification from Stardust Collective for any losses, damages, or other events in relation to the usage of DAGBot.\r\n\r\nFor full disclaimer and terms of service please visit [website].",
         "how_to_deposit": "transfer funds to XXX (TODO)",
         "how_to_withdrawal": "ask the bot for your address and request transfer (TODO)",
         "how_to_check_balance": "click the balance button  (TODO)",
@@ -35,20 +35,20 @@
         "text": "<b>Your current balance</b>:\r\nDAG {{balance}}"
     },
     "disclaimer": {
-        "pending": "You did not accept our disclaimer yet, please do so before using this feature.",
-        "finished": "Yay, your wallet is created! Deposit some DAG into your wallet with /deposit 🥰",
-        "declined": "Okay, no worries. If you change your mind, you know where to find us 😎"
+        "pending": "You must agree to the terms to deposit/withdraw.",
+        "finished": "Yay, your wallet is created! Deposit some DAG into your wallet with /deposit",
+        "declined": "Okay, no worries. If you change your mind, you know where to find us."
     },
     "deposit": {
-        "text": "Please send your DAG deposit to:\r\n\r\n<b>{{wallet_address}}</b>\r\n\r\nThis address is unique to you and all DAG deposited to this address will be credited to your DAGBot wallet."
+        "text": "Please send your $DAG deposit to:\r\n\r\n<b>{{wallet_address}}</b>\r\n\r\nThis address is unique to you and all $DAG deposited to this address will be credited to your DAGBot wallet."
     },
     "withdrawal": {
-        "text": "Your current balance is <b>DAG {{balance}}</b>.\r\n\r\nHow much do you want to withdraw from your wallet?",
-        "destination_text": "Please enter the address of the destination wallet.",
+        "text": "How much do you want to withdraw? Please enter the amount.",
+        "destination_text": "Please enter the address you would like to withdraw from. Make sure this is an address you own the private keys to and not an exchange address.",
         "invalid_amount": "The amount you entered is invalid, please check your input and try again.",
-        "insufficient_balance": "The amount you entered is invalid, is higher than your current balance.",
+        "insufficient_balance": "You do not have enough $DAG in your wallet. To deposit $DAG, click ‘deposit’.",
         "invalid_destination": "The address <b>{{destination}}</b>, is <b>not a valid DAG wallet address</b>! Please check your input, and send the correct destination address again.",
-        "confirm_text": "You are about to transfer <b>DAG {{amount}}</b> to <b>{{destination}}</b>, are you sure?",
+        "confirm_text": "Please confirm the withdrawal.\r\nAmount to withdraw: <b>DAG {{amount}}</b> to <b>{{destination}}</b>, are you sure?",
         "completed": "Transfer completed!",
         "canceled": "You canceled the transfer.",
         "error": "Something went wrong with your transfer, nothing has been processed."
