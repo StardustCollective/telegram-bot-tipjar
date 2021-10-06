@@ -47,7 +47,10 @@ export class Telegram {
       });
 
       const result = await response.json();
-      if (!result.ok) throw new Error("not ok");
+      if (!result.ok) {
+        console.error(result);
+        throw new Error("not ok");
+      }
       return result.result;
     }
 

@@ -9,8 +9,8 @@ import {Telegram} from "./telegram";
  */
 export class Webhook {
     DEFAULT_KEYBOARD = {inline: false, keys: [
-      [{text: "👛 Balance"}, {text: "🏦 Deposit"}],
-      [{text: "🦮 Withdraw"}, {text: "🆘 Help"}],
+      [{text: "💰 Deposit"}, {text: "💸 Withdraw"}],
+      [{text: "👛 Balance"}, {text: "🆘 Help"}],
     ]};
 
     /**
@@ -212,9 +212,6 @@ export class Webhook {
       const inlineKeyboard = {inline: true, keys: [
         this._addKeyboardButton("en", "buttons.help.get_started"),
         this._addKeyboardButton("en", "buttons.help.disclaimer"),
-        this._addKeyboardButton("en", "buttons.help.how_to_deposit"),
-        this._addKeyboardButton("en", "buttons.help.how_to_withdrawal"),
-        this._addKeyboardButton("en", "buttons.help.how_to_check_balance"),
         this._addKeyboardButton("en", "buttons.help.about_us"),
       ]};
 

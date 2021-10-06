@@ -44,10 +44,10 @@ exports.handleUpdate = functions
           case "👛 Balance":
             await webhook.handleBalance(tgUserId); break;
           case "/deposit":
-          case "🏦 Deposit":
+          case "💰 Deposit":
             await webhook.handleDeposit(tgUserId); break;
           case "/withdraw":
-          case "🦮 Withdraw":
+          case "💸 Withdraw":
             await webhook.handleWithdrawal(tgUserId); break;
           case "/help":
           case "🆘 Help":
