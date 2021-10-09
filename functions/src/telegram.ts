@@ -46,7 +46,7 @@ export class Telegram {
         method, headers, body,
       });
 
-      const result = await response.json();
+      const result = await response.json() as TelegramResponse;
       if (!result.ok) {
         console.error(result);
         throw new Error("not ok");
@@ -120,12 +120,6 @@ export class Telegram {
         if (keyboard.inline) {
           payload["reply_markup"] = {
             inline_keyboard: keyboard.keys,
-          };
-        } else {
-          payload["reply_markup"] = {
-            keyboard: keyboard.keys,
-            one_time_keyboard: false,
-            resize_keyboard: true,
           };
         }
       }

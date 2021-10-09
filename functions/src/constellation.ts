@@ -63,7 +63,7 @@ export class Constellation {
           .getAddressBalance(wallet.address);
 
       if (!result || !result.balance) return 0;
-      return result.balance;
+      return result.balance * 1e-8;
     }
 
     /**
@@ -72,12 +72,14 @@ export class Constellation {
      * @param {Wallet} wallet source wallet
      * @param {string} destAddr the destination address
      * @param {number} amount the amount to transfer
+     * @return {Promise<string>} the transaction hash
      */
     async transfer(
         wallet: Wallet, destAddr : string, amount: number
-    ) : Promise<void> {
+    ) : Promise<string> {
       dag4.account.loginPrivateKey(wallet.privateKey);
-      await dag4.account.transferDag(destAddr, amount);
+      const transfer = await dag4.account.transferDag(destAddr, amount);
+      return transfer.hash;
     }
 
     /**

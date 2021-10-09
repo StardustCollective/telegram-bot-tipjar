@@ -19,7 +19,6 @@ interface State {
 }
 
 interface WithdrawalState extends State {
-    balance: number,
     amount?: number,
     destinationAddress?: string
 }
@@ -34,4 +33,9 @@ type TelegramKeyboardButton = Array<TelegramKeyboardButtonInt>
 interface TelegramKeyboard {
     inline: boolean,
     keys: Array<TelegramKeyboardButton>
+}
+
+interface TelegramResponse {
+    ok: boolean,
+    result: string
 }

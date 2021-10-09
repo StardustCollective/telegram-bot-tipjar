@@ -42,9 +42,12 @@
         "invalid_amount": "The amount you entered is invalid, please check your input and try again.",
         "insufficient_balance": "You do not have enough $DAG in your wallet. To deposit $DAG, click ‘deposit’.",
         "invalid_destination": "The address <b>{{destination}}</b>, is <b>not a valid DAG wallet address</b>! Please check your input, and send the correct destination address again.",
+        "own_wallet": "You entered your own wallet address <b>{{destination}}</b>, please enter a valid destination address.",
         "confirm_text": "Please confirm the withdrawal.\r\nAmount to withdraw: <b>DAG {{amount}}</b> to <b>{{destination}}</b>, are you sure?",
         "completed": "Transfer completed!",
+        "post_completed": "You can follow your transaction on https://www.dagexplorer.io/search/?term={{hash}}",
         "canceled": "You canceled the transfer.",
+        "post_cancel": "Nothing has been taken from your wallet.",
         "error": "Something went wrong with your transfer, nothing has been processed."
     }
 }

@@ -55,12 +55,13 @@ export class Webhook {
         Promise<string> {
       const user = await this.checkUser(userId);
       if (!user || !user.wallet) return "";
+      await Database.getInstance().clearState(userId);
 
       const balance = await Constellation.getInstance()
           .getBalance(user.wallet);
 
       const tokens = new Map();
-      tokens.set("balance", balance * 1e-8);
+      tokens.set("balance", balance);
       return Telegram.getInstance().sendText(userId,
           Language.getString( "en", "balance.text", tokens )
       );
@@ -72,6 +73,7 @@ export class Webhook {
      * @return {Promise}
      */
     async handleDisclaimer(userId: string) : Promise<string> {
+      await Database.getInstance().clearState(userId);
       return Telegram.getInstance().sendText(
           userId,
           Language.getString( "en", "help.disclaimer"),
@@ -90,6 +92,7 @@ export class Webhook {
       const user = await this.checkUser(userId);
       if (!user || !user.wallet) return "";
       if (!await this.checkDisclaimer(userId, user)) return "";
+      await Database.getInstance().clearState(userId);
 
       const tokens = new Map();
       tokens.set("wallet_address", user.wallet.address);
@@ -108,14 +111,15 @@ export class Webhook {
       const user = await this.checkUser(userId);
       if (!user || !user.wallet) return "";
       if (!await this.checkDisclaimer(userId, user)) return "";
+      await Database.getInstance().clearState(userId);
 
       const balance = await Constellation.getInstance()
           .getBalance(user.wallet);
 
       const tokens = new Map();
-      tokens.set("balance", balance * 1e-8);
+      tokens.set("balance", balance);
       await Database.getInstance().setState(
-          userId, {path: "withdrawal", section: "amount", balance: balance}
+          userId, {path: "withdrawal", section: "amount"}
       );
       return Telegram.getInstance().sendText(
           userId, Language.getString( "en", "withdrawal.text", tokens),
@@ -154,16 +158,24 @@ export class Webhook {
       if (state.path === "withdrawal") {
         const withdrawalState = state as WithdrawalState;
         if (withdrawalState.section === "amount") {
-          withdrawalState.amount = parseInt(input, 10);
-          if (!withdrawalState.amount || isNaN(withdrawalState.amount)) {
+          withdrawalState.amount = parseFloat(parseFloat(input).toFixed(8));
+          const balance = await Constellation.getInstance()
+              .getBalance(user.wallet);
+
+          if (
+            !withdrawalState.amount ||
+              isNaN(withdrawalState.amount) ||
+              withdrawalState.amount < 0
+          ) {
             return Telegram.getInstance().sendText(
                 userId, Language.getString( "en", "withdrawal.invalid_amount")
             );
-          } else if (withdrawalState.amount > withdrawalState.balance) {
+          } else if (withdrawalState.amount > balance) {
+            await Database.getInstance().clearState(userId);
             return Telegram.getInstance().sendText(
                 userId, Language.getString( "en",
                     "withdrawal.insufficient_balance"
-                )
+                ), this.DEFAULT_KEYBOARD
             );
           }
           withdrawalState.section = "destination";
@@ -172,20 +184,25 @@ export class Webhook {
               userId, Language.getString( "en", "withdrawal.destination_text")
           );
         } else if (withdrawalState.section === "destination") {
+          const tokens = new Map();
+          tokens.set("amount", withdrawalState.amount);
+          tokens.set("destination", input);
+          if (user.wallet.address === input) {
+            return Telegram.getInstance().sendText(
+                userId, Language.getString( "en",
+                    "withdrawal.own_wallet", tokens
+                )
+            );
+          }
           if (!Constellation.getInstance().validate(input)) {
             return Telegram.getInstance().sendText(
                 userId, Language.getString( "en",
-                    "withdrawal.invalid_destination"
+                    "withdrawal.invalid_destination", tokens
                 )
             );
           }
           withdrawalState.destinationAddress = input;
           await Database.getInstance().setState(userId, withdrawalState);
-
-          const tokens = new Map();
-          tokens.set("amount", withdrawalState.amount);
-          tokens.set("destination", input);
-
           return Telegram.getInstance().sendText(
               userId,
               Language.getString( "en", "withdrawal.confirm_text", tokens),
@@ -266,19 +283,29 @@ export class Webhook {
             );
           }
 
-          await Constellation.getInstance().transfer(
+          const transferHash = await Constellation.getInstance().transfer(
               user.wallet, state.destinationAddress, state.amount
           );
 
-          return Telegram.getInstance().editMessage(
+          const tokens = new Map();
+          tokens.set("hash", transferHash);
+          await Telegram.getInstance().editMessage(
               chatId, messageId,
-              Language.getString("en", "withdrawal.completed"),
+              Language.getString("en", "withdrawal.completed")
+          );
+          return Telegram.getInstance().sendText(
+              chatId,
+              Language.getString("en", "withdrawal.post_completed", tokens),
               this.DEFAULT_KEYBOARD
           );
         } else {
-          return Telegram.getInstance().editMessage(
+          await Telegram.getInstance().editMessage(
               chatId, messageId,
-              Language.getString("en", "withdrawal.canceled"),
+              Language.getString("en", "withdrawal.canceled")
+          );
+          return Telegram.getInstance().sendText(
+              chatId,
+              Language.getString("en", "withdrawal.post_cancel"),
               this.DEFAULT_KEYBOARD
           );
         }
