@@ -63,7 +63,7 @@ export class Constellation {
           .getAddressBalance(wallet.address);
 
       if (!result || !result.balance) return 0;
-      return result.balance * 1e-8;
+      return parseFloat((result.balance * 1e-8).toFixed(8));
     }
 
     /**
