@@ -13,6 +13,10 @@
         "withdraw": {
             "confirm": "Yes, start transfer.",
             "decline": "No, start over."
+        },
+        "tip": {
+            "confirm": "Yes, start transfer.",
+            "decline": "No, start over."
         }
     },
     "help": {
@@ -49,5 +53,14 @@
         "canceled": "You canceled the transfer.",
         "post_cancel": "Nothing has been taken from your wallet.",
         "error": "Something went wrong with your transfer, nothing has been processed."
+    },
+    "tip": {
+        "confirm_text": "Please confirm the transfer.\r\nAmount to transfer: <b>DAG {{amount}}</b> to <b>{{destination}}</b>, are you sure?",
+        "invalid_format": "You are trying to use the /tip command in a wrong way, the format is <b>/tip @username amount</b>. So for example <b>/tip @BotFather 111.23456789</b>",
+        "invalid_amount": "The amount you entered is invalid, please check your input and try again.",
+        "insufficient_balance": "You do not have enough $DAG in your wallet. To deposit $DAG, click ‘deposit’.",
+        "invalid_target_user": "The user you are trying to tip does not have a DAGBot TipJar wallet set up, so you can not send them DAG.",
+        "completed": "Transfer completed! You can follow your transaction on https://www.dagexplorer.io/search/?term={{hash}}",
+        "canceled": "You canceled the transfer."
     }
 }

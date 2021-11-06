@@ -56,6 +56,19 @@ export class Database {
   }
 
   /**
+  * Gets an existing a user by telegram username.
+  * @param {string} username - telegram username
+  * @return {Promise} returns DB
+  */
+  async getUserByUsername(username: string): Promise<DBUser | null> {
+    const snapshot = await fb.database().ref(`usernames/${username}`)
+        .once("value", (snapshot) => snapshot);
+
+    if (!snapshot || !snapshot.val()) return null;
+    return await this.getUser(snapshot.val().id);
+  }
+
+  /**
   * Updates given DBUser in database
   * @param {string} userID - telegram user id
   * @param {DBUser} user - db user object
@@ -73,7 +86,8 @@ export class Database {
    * @param {string} path - telegram user id
    * @return {Promise}
    */
-  async getState(userID : string) : Promise<State | WithdrawalState> {
+  async getState(userID : string)
+    : Promise<State | WithdrawalState | TipState> {
     const snapshot = await fb.database().ref(`state/${userID}`)
         .once("value", (snapshot) => snapshot);
 
@@ -87,7 +101,8 @@ export class Database {
    * @param {any} payload - extra payload for state
    * @return {Promise}
    */
-  setState(userID : string, state : State | WithdrawalState) : Promise<void> {
+  setState(userID : string, state : State | WithdrawalState | TipState)
+    : Promise<void> {
     return fb.database().ref(`state/${userID}`).update(state);
   }
 

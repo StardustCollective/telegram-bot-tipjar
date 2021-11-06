@@ -18,10 +18,17 @@ interface State {
     section: string
 }
 
+interface TipState extends State {
+    amount?: number,
+    destinationAddress?: string
+    destinationUser?: string
+}
+
 interface WithdrawalState extends State {
     amount?: number,
     destinationAddress?: string
 }
+
 interface TelegramKeyboardButtonInt {
     text: string,
     // TG API needs like this, so ignore eslint.

@@ -128,6 +128,63 @@ export class Webhook {
     }
 
     /**
+     * @param {string} userId - telegram user id
+     * @param {UserSchema} user - DB user
+     * @param {string} targetUsername - target user
+     * @param {number} amount - the amount to tip target user.
+     * @return {Promise}
+     */
+    async handleTip(
+        userId: string,
+        user: UserSchema,
+        targetUsername: string,
+        amount: number
+    ) : Promise<string> {
+      if (!user || !user.wallet) return "";
+      const targetUser = await Database.getInstance()
+          .getUserByUsername(targetUsername);
+      if (!targetUser) {
+        return Telegram.getInstance().sendText(
+            userId, Language.getString( "en", "tip.invalid_target_user"),
+            this.DEFAULT_KEYBOARD
+        );
+      }
+      const balance = await Constellation.getInstance()
+          .getBalance(user.wallet);
+      if (amount > balance) {
+        return Telegram.getInstance().sendText(
+            userId, Language.getString( "en", "tip.insufficient_balance"),
+            this.DEFAULT_KEYBOARD
+        );
+      }
+
+      const tokens = new Map();
+      tokens.set("amount", amount);
+      tokens.set("destination", targetUsername);
+
+      if (!targetUser.wallet) {
+        throw new Error("Got no wallet, should be impossible.");
+      }
+      await Database.getInstance().setState(
+          userId, {
+            path: "tip",
+            section: "confirmation",
+            amount: amount,
+            destinationAddress: targetUser.wallet.address,
+            destinationUser: targetUsername,
+          }
+      );
+      return Telegram.getInstance().sendText(
+          userId,
+          Language.getString( "en", "tip.confirm_text", tokens),
+          {inline: true, keys: [
+            this._addKeyboardButton("en", "buttons.tip.confirm"),
+            this._addKeyboardButton("en", "buttons.tip.decline"),
+          ]}
+      );
+    }
+
+    /**
      *
      * @param {string} language the language to use
      * @param {string} path the path of translation
@@ -151,6 +208,27 @@ export class Webhook {
     async handleDefault(userId: string, input: string) : Promise<string> {
       const user = await this.checkUser(userId);
       if (!user || !user.wallet) return "";
+
+      const [cmd, targetUsername, amount] = input.split(" ");
+      if (cmd === "/tip") {
+        await Database.getInstance().clearState(userId);
+        if (!targetUsername || !targetUsername.startsWith("@") || !amount) {
+          return Telegram.getInstance().sendText(
+              userId, Language.getString( "en", "tip.invalid_format"),
+              this.DEFAULT_KEYBOARD
+          );
+        }
+
+        const transferAmount = parseFloat(parseFloat(amount).toFixed(8));
+        if (!transferAmount) {
+          return Telegram.getInstance().sendText(
+              userId, Language.getString( "en", "tip.invalid_amount"),
+              this.DEFAULT_KEYBOARD
+          );
+        }
+
+        return this.handleTip(userId, user, targetUsername, transferAmount);
+      }
 
       const state = await Database.getInstance().getState(userId);
       if (!state) return "";
@@ -266,6 +344,37 @@ export class Webhook {
 
       const user = await this.checkUser(userId);
       if (!user) return "";
+
+      if (section === "tip") {
+        if (subject === "confirm") {
+          const state = await Database.getInstance()
+              .getState(userId) as TipState;
+
+          if (!user.wallet) {
+            throw new Error("Got no wallet, should be impossible.");
+          }
+
+          if (!state.destinationAddress || !state.amount) {
+            throw new Error("Got invalid tip state, should be impossible.");
+          }
+
+          const transferHash = await Constellation.getInstance().transfer(
+              user.wallet, state.destinationAddress, state.amount
+          );
+
+          const tokens = new Map();
+          tokens.set("hash", transferHash);
+          return Telegram.getInstance().editMessage(
+              chatId, messageId,
+              Language.getString("en", "tip.completed", tokens)
+          );
+        } else {
+          return Telegram.getInstance().editMessage(
+              chatId, messageId,
+              Language.getString("en", "tip.canceled")
+          );
+        }
+      }
 
       if (section === "withdraw") {
         const state = await Database.getInstance()

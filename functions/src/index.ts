@@ -1,8 +1,24 @@
+import * as fb from "firebase-admin";
 import * as functions from "firebase-functions";
+import {Database} from "./database";
 import {Webhook} from "./webhook";
+
+// Setup DB for triggers.
+Database.getInstance();
 
 const webhook = new Webhook();
 
+// Ensure user_id / username combination is always updated in `usernames` table,
+// when usernames change for TG userIDs.
+exports.dbUsernameTrigger = functions.database.ref("/users/{user_id}/username")
+    .onWrite(async (change, context) => {
+      await fb.database().ref(`usernames/@${change.before.val()}`).remove();
+      await fb.database().ref(`usernames/@${change.after.val()}`).update(
+          {id: context.params.user_id}
+      );
+    });
+
+// HTTP Handler for Telegram webhook.
 exports.handleUpdate = functions
     .runWith({
       minInstances: 2,
