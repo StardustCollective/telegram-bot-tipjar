@@ -30,11 +30,11 @@
         "wallet_not_found": "Cannot find your wallet, run /start to setup your wallet."
     },
     "balance": {
-        "text": "<b>Your current balance</b>:\r\nDAG {{balance}}"
+        "text": "<b>Your current balance</b>:\r\n{{balance}} DAG"
     },
     "disclaimer": {
         "pending": "You must agree to the terms to deposit/withdraw.",
-        "finished": "Yay, your wallet is created! Deposit some DAG into your wallet with /deposit",
+        "finished": "Yay, your wallet is created! Deposit some $DAG into your wallet with /deposit",
         "declined": "Okay, no worries. If you change your mind, you know where to find us."
     },
     "deposit": {
@@ -47,7 +47,7 @@
         "insufficient_balance": "You do not have enough $DAG in your wallet. To deposit $DAG, click ‘deposit’.",
         "invalid_destination": "The address <b>{{destination}}</b>, is <b>not a valid DAG wallet address</b>! Please check your input, and send the correct destination address again.",
         "own_wallet": "You entered your own wallet address <b>{{destination}}</b>, please enter a valid destination address.",
-        "confirm_text": "Please confirm the withdrawal.\r\nAmount to withdraw: <b>DAG {{amount}}</b> to <b>{{destination}}</b>, are you sure?",
+        "confirm_text": "Please confirm the withdrawal.\r\nAmount to withdraw: <b>{{amount}} DAG</b> to <b>{{destination}}</b>, are you sure?",
         "completed": "Transfer completed!",
         "post_completed": "You can follow your transaction on https://www.dagexplorer.io/search/?term={{hash}}",
         "canceled": "You canceled the transfer.",
@@ -55,11 +55,11 @@
         "error": "Something went wrong with your transfer, nothing has been processed."
     },
     "tip": {
-        "confirm_text": "Please confirm the transfer.\r\nAmount to transfer: <b>DAG {{amount}}</b> to <b>{{destination}}</b>, are you sure?",
-        "invalid_format": "You are trying to use the /tip command in a wrong way, the format is <b>/tip @username amount</b>. So for example <b>/tip @BotFather 111.23456789</b>",
+        "confirm_text": "Please confirm the transfer.\r\nAmount to transfer: <b>{{amount}} DAG</b> to <b>{{destination}}</b>, are you sure?",
+        "invalid_format": "Invalid format for the /tip command. The format is <b>/tip @username amount</b>. So for example <b>/tip @BotFather 111.23456789</b>",
         "invalid_amount": "The amount you entered is invalid, please check your input and try again.",
         "insufficient_balance": "You do not have enough $DAG in your wallet. To deposit $DAG, click ‘deposit’.",
-        "invalid_target_user": "The user you are trying to tip does not have a DAGBot TipJar wallet set up, so you can not send them DAG.",
+        "invalid_target_user": "The user you are trying to tip does not have a DAGBot TipJar wallet set up, so you can not send them $DAG.",
         "completed": "Transfer completed! You can follow your transaction on https://www.dagexplorer.io/search/?term={{hash}}",
         "canceled": "You canceled the transfer."
     }
