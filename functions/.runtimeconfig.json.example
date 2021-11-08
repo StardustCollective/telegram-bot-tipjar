@@ -1,0 +1,14 @@
+{
+    "env": {
+        "production": false,
+        "databaseURL": ""
+    },
+    "dag_network": {
+        "id": "ceres",
+        "beUrl": "https://api-be.exchanges.constellationnetwork.io",
+        "lbUrl": "http://lb.exchanges.constellationnetwork.io:9000"
+    },
+    "telegram": {
+        "bot_token": "<bot_id>:<bot_token>"
+    }
+}
