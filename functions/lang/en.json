@@ -1,5 +1,5 @@
 {
-    "welcome": "Hi @{{username}}!\r\n\r\nUse the buttons below to check your balance and explore your wallet.\r\n\r\nWant to start sending and receiving $DAG? Join the DAGBot group chat and see how other people are using DAGBot.\r\n\r\nFor a quick tutorial click 'Help' below.",
+    "welcome": "Hi @{{username}}!\r\n\r\nYour wallet is now configured and you can begin sending and receiving DAG. Use the buttons below to check your balance and explore your wallet.\r\n\r\nIMPORTANT: The private key of your wallet cannot be exported. This wallet is for entertainment purposes only. Do not store significant amounts of DAG in this wallet. \r\n\r\nFor a quick tutorial click 'Help' below.",
     "buttons": {
         "help": {
             "get_started": "Getting Started",
@@ -22,8 +22,8 @@
     "help": {
         "title": "Choose a topic below, to learn more about it.",
         "return": "Return",
-        "get_started": "<b>What is DAGBot?</b>\r\nDAGBot is a fee-less way to share $DAG tokens with your friends and the community.\r\n\r\n<b>Getting Started</b>\r\nCheck your balance by clicking on the Balance button below or by clicking /balance.\r\n\r\nTo <b>deposit</b>, use the Deposit button or click /deposit and follow the instructions when prompted. <b>Note</b>: DAGBot only accepts $DAG tokens.\r\n\r\nTo <b>withdraw</b>, use the Withdraw button or click /withdraw.",
-        "disclaimer": "This program “DAGBot” is a work in progress, and as such provided on an as is basis. The developer and team behind DAGBot (collectively 'Stardust Collective') make no guarantees in terms of financial gain/loss, cybersecurity or otherwise that DAGBot will be error or risk-free, function as desired or without disruptions or imperfections.\r\n\r\nBy using DAGBot, you agree to hold harmless Stardust Collective and DAGBot without limitation up to and including total financial loss. Stardust Collective assumes no liability, and you, as the user, agree not to seek indemnification from Stardust Collective for any losses, damages, or other events in relation to the usage of DAGBot.",
+        "get_started": "<b>What is DAG Tip Bot?</b>\r\nDAG Tip Bot is a fee-less way to share $DAG tokens with your friends and the community.\r\n\r\n<b>Getting Started</b>\r\nCheck your balance by clicking on the Balance button below or by clicking /balance.\r\n\r\nTo <b>deposit</b>, use the Deposit button or click /deposit and follow the instructions when prompted. <b>Note</b>: DAG Tip Bot only accepts $DAG tokens.\r\n\r\nTo <b>withdraw</b>, use the Withdraw button or click /withdraw.",
+        "disclaimer": "This program “DAG Tip Bot” is a work in progress, and as such provided on an as is basis. The developer and team behind DAG Tip Bot (collectively 'Stardust Collective') make no guarantees in terms of financial gain/loss, cybersecurity or otherwise that DAG Tip Bot will be error or risk-free, function as desired or without disruptions or imperfections.\r\n\r\nBy using DAG Tip Bot, you agree to hold harmless Stardust Collective and DAG Tip Bot without limitation up to and including total financial loss. Stardust Collective assumes no liability, and you, as the user, agree not to seek indemnification from Stardust Collective for any losses, damages, or other events in relation to the usage of DAG Tip Bot.",
         "about_us": "Developed by Constellation Network for its community. To learn more about Constellation Network visit https://constellationnetwork.io\r\nIf you need any help, please visit our Stardust Support Telegram channel at: https://t.me/StardustSupport"
     },
     "errors": {
@@ -38,7 +38,7 @@
         "declined": "Okay, no worries. If you change your mind, you know where to find us."
     },
     "deposit": {
-        "text": "Please send your $DAG deposit to:\r\n\r\n<b>{{wallet_address}}</b>\r\n\r\nThis address is unique to you and all $DAG deposited to this address will be credited to your DAGBot wallet."
+        "text": "Please send your $DAG deposit to:\r\n\r\n<b>{{wallet_address}}</b>\r\n\r\nThis address is unique to you and all $DAG deposited to this address will be credited to your DAG Tip Bot wallet."
     },
     "withdrawal": {
         "text": "How much do you want to withdraw? Please enter the amount.",
@@ -48,7 +48,7 @@
         "invalid_destination": "The address <b>{{destination}}</b>, is <b>not a valid DAG wallet address</b>! Please check your input, and send the correct destination address again.",
         "own_wallet": "You entered your own wallet address <b>{{destination}}</b>, please enter a valid destination address.",
         "confirm_text": "Please confirm the withdrawal.\r\nAmount to withdraw: <b>{{amount}} DAG</b> to <b>{{destination}}</b>, are you sure?",
-        "completed": "Transfer completed!",
+        "completed": "Transfer sent!",
         "post_completed": "You can follow your transaction on https://www.dagexplorer.io/search/?term={{hash}}",
         "canceled": "You canceled the transfer.",
         "post_cancel": "Nothing has been taken from your wallet.",
@@ -59,8 +59,10 @@
         "invalid_format": "Invalid format for the /tip command. The format is <b>/tip @username amount</b>. So for example <b>/tip @BotFather 111.23456789</b>",
         "invalid_amount": "The amount you entered is invalid, please check your input and try again.",
         "insufficient_balance": "You do not have enough $DAG in your wallet. To deposit $DAG, click ‘deposit’.",
-        "invalid_target_user": "The user you are trying to tip does not have a DAGBot TipJar wallet set up, so you can not send them $DAG.",
-        "completed": "Transfer completed! You can follow your transaction on https://www.dagexplorer.io/search/?term={{hash}}",
+        "invalid_target_user": "The user you are trying to tip does not have a DAG Tip Bot wallet set up. You can resend the tip once their wallet is configured.",
+        "target_user_setup": "{{recipient}} - Someone tried to send you a DAG tip but you don't have a wallet configured. Go to https://t.me/DAGTipBot and type /start to begin setup.",
+        "completed": "Transfer sent! You can follow your transaction on https://www.dagexplorer.io/search/?term={{hash}}",
+        "completed_public": "{{sender}} tipped {{recipient}} {{amount}} DAG",
         "canceled": "You canceled the transfer."
     }
 }

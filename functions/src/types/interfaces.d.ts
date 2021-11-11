@@ -22,6 +22,8 @@ interface TipState extends State {
     amount?: number,
     destinationAddress?: string
     destinationUser?: string
+    sourceChatId: string
+    sourceUsername: string
 }
 
 interface WithdrawalState extends State {

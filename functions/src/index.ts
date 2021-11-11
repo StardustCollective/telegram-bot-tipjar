@@ -25,6 +25,8 @@ exports.handleUpdate = functions
     })
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     .https.onRequest(async (req, res): Promise<any> => {
+      console.log("handleUpdate req.body: ", JSON.stringify(req.body));
+
       if (!req.body.message && !req.body.callback_query) {
         return res.status(200).send();
       }
@@ -48,8 +50,14 @@ exports.handleUpdate = functions
           }
         }
 
+        console.log("message.chat: ", JSON.stringify(req.body.message.chat));
+
         const tgUserId = req.body.message.from.id;
         const tgUsername = req.body.message.from.username;
+        const messageText = req.body.message.text;
+        const chatId = req.body.message.chat?.id;
+
+        console.log("chatID: ", chatId);
 
         // The commands are sent by 'text',
         // so parse them and start the chosen flow.
@@ -71,7 +79,7 @@ exports.handleUpdate = functions
           case "/disclaimer":
             await webhook.handleDisclaimer(tgUserId); break;
           default:
-            await webhook.handleDefault(tgUserId, req.body.message.text); break;
+            await webhook.handleDefault(tgUserId, messageText, chatId); break;
         }
 
         return res.status(200).send();

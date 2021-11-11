@@ -132,25 +132,40 @@ export class Webhook {
      * @param {UserSchema} user - DB user
      * @param {string} targetUsername - target user
      * @param {number} amount - the amount to tip target user.
+     * @param {string} chatId - the ID of the chat the message originated from.
      * @return {Promise}
      */
     async handleTip(
         userId: string,
         user: UserSchema,
         targetUsername: string,
-        amount: number
+        amount: number,
+        chatId: string
     ) : Promise<string> {
       if (!user || !user.wallet) return "";
+
       const targetUser = await Database.getInstance()
           .getUserByUsername(targetUsername);
+
       if (!targetUser) {
+        const targetUserData = new Map();
+        targetUserData.set("recipient", targetUsername);
+
+        await Telegram.getInstance().sendText(
+            chatId,
+            Language.getString( "en", "tip.target_user_setup", targetUserData)
+        );
+
         return Telegram.getInstance().sendText(
-            userId, Language.getString( "en", "tip.invalid_target_user"),
+            userId,
+            Language.getString( "en", "tip.invalid_target_user"),
             this.DEFAULT_KEYBOARD
         );
       }
+
       const balance = await Constellation.getInstance()
           .getBalance(user.wallet);
+
       if (amount > balance) {
         return Telegram.getInstance().sendText(
             userId, Language.getString( "en", "tip.insufficient_balance"),
@@ -165,6 +180,7 @@ export class Webhook {
       if (!targetUser.wallet) {
         throw new Error("Got no wallet, should be impossible.");
       }
+
       await Database.getInstance().setState(
           userId, {
             path: "tip",
@@ -172,8 +188,11 @@ export class Webhook {
             amount: amount,
             destinationAddress: targetUser.wallet.address,
             destinationUser: targetUsername,
+            sourceChatId: chatId,
+            sourceUsername: user.username,
           }
       );
+
       return Telegram.getInstance().sendText(
           userId,
           Language.getString( "en", "tip.confirm_text", tokens),
@@ -203,13 +222,18 @@ export class Webhook {
      * could be expanded to more later.
      * @param {string} userId the telegram user id
      * @param {string} input whatever the user input
+     * @param {string} chatId the ID of the chat the command originated from
      * @return {Promise}
      */
-    async handleDefault(userId: string, input: string) : Promise<string> {
+    async handleDefault(
+        userId: string,
+        input: string,
+        chatId: string
+    ) : Promise<string> {
       const user = await this.checkUser(userId);
       if (!user || !user.wallet) return "";
 
-      const [cmd, targetUsername, amount] = input.split(" ");
+      const [cmd, targetUsername, amount] = input?.split(" ");
       if (cmd === "/tip") {
         await Database.getInstance().clearState(userId);
         if (!targetUsername || !targetUsername.startsWith("@") || !amount) {
@@ -219,7 +243,10 @@ export class Webhook {
           );
         }
 
-        const transferAmount = parseFloat(parseFloat(amount).toFixed(8));
+        // Allow users to send "1.01" or "1.01 DAG"
+        const _amount = amount.replace("DAG", "").trim();
+
+        const transferAmount = parseFloat(parseFloat(_amount).toFixed(8));
         if (!transferAmount) {
           return Telegram.getInstance().sendText(
               userId, Language.getString( "en", "tip.invalid_amount"),
@@ -227,7 +254,13 @@ export class Webhook {
           );
         }
 
-        return this.handleTip(userId, user, targetUsername, transferAmount);
+        return this.handleTip(
+            userId,
+            user,
+            targetUsername,
+            transferAmount,
+            chatId
+        );
       }
 
       const state = await Database.getInstance().getState(userId);
@@ -360,6 +393,20 @@ export class Webhook {
 
           const transferHash = await Constellation.getInstance().transfer(
               user.wallet, state.destinationAddress, state.amount
+          );
+
+          const completedPublicParams = new Map();
+          completedPublicParams.set("sender", "@" + state.sourceUsername);
+          completedPublicParams.set("recipient", state.destinationUser);
+          completedPublicParams.set("amount", state.amount);
+
+          await Telegram.getInstance().sendText(
+              state.sourceChatId,
+              Language.getString(
+                  "en",
+                  "tip.completed_public",
+                  completedPublicParams
+              )
           );
 
           const tokens = new Map();

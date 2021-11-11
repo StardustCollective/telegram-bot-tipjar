@@ -65,7 +65,8 @@ export class Telegram {
      * @return {Promise}
      */
     sendText(
-        chatId: string, text: string,
+        chatId: string,
+        text: string,
         keyboard?: TelegramKeyboard,
         removeKeyboard?: boolean
     ) : Promise<string> {
