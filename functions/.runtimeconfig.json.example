@@ -1,7 +1,8 @@
 {
     "env": {
         "production": false,
-        "databaseURL": ""
+        "databaseURL": "",
+        "webhookAPIKey": "some-secure-string"
     },
     "dag_network": {
         "id": "ceres",
