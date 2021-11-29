@@ -10,7 +10,7 @@ Database.getInstance();
 const webhook = new Webhook();
 
 // Get TG Webhook API key from ENV.
-const WEBHOOK_API_KEY = config().env.webhookAPIKey;
+const WEBHOOK_API_KEY = config().env.webhook_api_key;
 
 // Ensure user_id / username combination is always updated in `usernames` table,
 // when usernames change for TG userIDs.

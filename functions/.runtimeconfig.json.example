@@ -1,13 +1,13 @@
 {
     "env": {
         "production": false,
-        "databaseURL": "",
-        "webhookAPIKey": "some-secure-string"
+        "database_url": "",
+        "webhook_api_key": "some-secure-string"
     },
     "dag_network": {
         "id": "ceres",
-        "beUrl": "https://api-be.exchanges.constellationnetwork.io",
-        "lbUrl": "http://lb.exchanges.constellationnetwork.io:9000"
+        "be_url": "https://api-be.exchanges.constellationnetwork.io",
+        "lb_url": "http://lb.exchanges.constellationnetwork.io:9000"
     },
     "telegram": {
         "bot_token": "<bot_id>:<bot_token>"
