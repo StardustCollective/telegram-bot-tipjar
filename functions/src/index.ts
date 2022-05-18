@@ -3,6 +3,7 @@ import * as functions from "firebase-functions";
 import {config} from "firebase-functions";
 import {Database} from "./database";
 import {Webhook} from "./webhook";
+import {Language} from "./language";
 
 // Setup DB for triggers.
 Database.getInstance();
@@ -47,7 +48,8 @@ exports.telegram = functions
                 req.body.callback_query.from.id,
                 req.body.callback_query.message.chat.id,
                 req.body.callback_query.message.message_id,
-                req.body.callback_query.data
+                req.body.callback_query.data,
+                req.body.callback_query.from.language_code,
             );
             return res.status(200).send();
           } catch (ex) {
@@ -62,30 +64,38 @@ exports.telegram = functions
         const tgUsername = req.body.message.from.username;
         const messageText = req.body.message.text;
         const chatId = req.body.message.chat?.id;
+        const tgUserLanguage = req.body.message.from.language_code;
 
         console.log("chatID: ", chatId);
+
+        const {
+          translatedBalance, 
+          translatedHelp, 
+          translatedDeposit, 
+          translatedWithdraw
+        } = Language.getKeyboardStrings(tgUserLanguage);
 
         // The commands are sent by 'text',
         // so parse them and start the chosen flow.
         switch (req.body.message.text) {
           case "/start":
-            await webhook.handleStart(tgUserId, tgUsername); break;
+            await webhook.handleStart(tgUserId, tgUsername, tgUserLanguage); break;
           case "/balance":
-          case "👛 Balance":
-            await webhook.handleBalance(tgUserId); break;
+          case translatedBalance:
+            await webhook.handleBalance(tgUserId, tgUserLanguage); break;
           case "/deposit":
-          case "💰 Deposit":
-            await webhook.handleDeposit(tgUserId); break;
+          case translatedDeposit:
+            await webhook.handleDeposit(tgUserId, tgUserLanguage); break;
           case "/withdraw":
-          case "💸 Withdraw":
-            await webhook.handleWithdrawal(tgUserId); break;
+          case translatedWithdraw:
+            await webhook.handleWithdrawal(tgUserId, tgUserLanguage); break;
           case "/help":
-          case "🆘 Help":
-            await webhook.handleHelp(tgUserId); break;
+          case translatedHelp:
+            await webhook.handleHelp(tgUserId, tgUserLanguage); break;
           case "/disclaimer":
-            await webhook.handleDisclaimer(tgUserId); break;
+            await webhook.handleDisclaimer(tgUserId, tgUserLanguage); break;
           default:
-            await webhook.handleDefault(tgUserId, messageText, chatId); break;
+            await webhook.handleDefault(tgUserId, messageText, chatId, tgUserLanguage); break;
         }
 
         return res.status(200).send();
