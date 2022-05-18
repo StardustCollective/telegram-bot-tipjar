@@ -64,5 +64,11 @@
         "completed": "Transfer sent! You can follow your transaction on https://www.dagexplorer.io/search/?term={{hash}}",
         "completed_public": "{{sender}} tipped {{recipient}} {{amount}} DAG",
         "canceled": "You canceled the transfer."
+    },
+    "keyboard": { 
+        "balance": "👛 Balance",
+        "deposit": "💰 Deposit",
+        "withdraw": "💸 Withdraw",
+        "help": "🆘 Help"
     }
 }

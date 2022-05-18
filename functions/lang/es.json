@@ -1,0 +1,74 @@
+{
+    "welcome": "Hola @{{username}}!\r\n\r\nSu billetera ha sido configurada y ya puede comenzar a enviar y recibir $DAG. Utilice los botones de abajo para revisar su balance y explorar su billetera.\r\n\r\nIMPORTANTE: La llave privada de su billetera no se puede exportar. Esta billetera solo existe con fines de entretenimiento, no guarde cantidades significativas de $DAG en ella. \r\n\r\nPara ver un tutorial rápido, haga click en 'Ayuda'.",
+    "buttons": {
+        "help": {
+            "get_started": "Comenzando",
+            "disclaimer": "Aviso legal",
+            "about_us": "Acerca de"
+        },
+        "disclaimer": {
+            "accept": "Si, estoy de acuerdo las condiciones.",
+            "decline": "No, no estoy de acuerdo con las condiciones."
+        },
+        "withdraw": {
+            "confirm": "Si, comenzar transferencia.",
+            "decline": "No, volver."
+        },
+        "tip": {
+            "confirm": "Si, comenzar transferencia.",
+            "decline": "No, volver."
+        }
+    },
+    "help": {
+        "title": "Seleccione una opcion para conocer mas sobre ella.",
+        "return": "Volver",
+        "get_started": "<b>Que es DAG Tip Bot?</b>\r\n DAG Tip Bot es una manera sin cargo de compartir $DAG tokens con tus amigos y con la comunidad.\r\n\r\n<b>Comenzando</b>\r\nConozca su balance haciendo click en el botón Balance o ingresando /balance.\r\n\r\nPara <b>depositar</b>, haga click en el botón Depositar o ingrese /deposit y siga las instrucciones. <b>Nota</b>: DAG Tip Bot solo acepta tokens $DAG.\r\n\r\nPara <b>retirar fondos</b>, haga click en el botón Retirar o ingrese /withdraw.",
+        "disclaimer": "Este programa “DAG Tip Bot” es un trabajo en proceso, y por lo tanto, es provisto como tal. El desarrollador y el equipo detrás de DAG Tip Bot (denominado en su conjunto ‘Stardust Collective’) no da garantías en términos de ganancias o pérdidas financieras, ciberseguridad o que DAG Tip Bot esté libre de errores y riesgos, funcione como se espera o no posea disrupciones o imperfecciones.\r\n\r\nAl usar DAG Tip Bot, usted acepta eximir de cualquier responsabilidad a Stardust Collective y DAG Tip Bot sin limitaciones, incluyendo pérdida financiera total. Stardust Collective no asume ninguna responsabilidad y usted, como usuario, acepta no buscar indemnización de Stardust Collective por cualquier pérdida, daño u otros eventos relacionados al uso de DAG Tip Bot.",
+        "about_us": "Desarrollado por Constellation Network para su comunidad. Para aprender más acerca de Constellation Network, visite https://constellationnetwork.io\r\nSi necesita ayuda, por favor visite nuestro canal de Telegram, Stardust Support en: https://t.me/StardustSupport"
+    },
+    "errors": {
+        "wallet_not_found": "No pudimos encontrar su billetera, ingrese /start para configurar una."
+    },
+    "balance": {
+        "text": "<b>Su balance actual es de</b>:\r\n{{balance}} DAG"
+    },
+    "disclaimer": {
+        "pending": "Debe aceptar las condiciones para depositar/retirar.",
+        "finished": "Su billetera fue creada! Deposite $DAG en ella ingresando /deposit",
+        "declined": "Okey, no se preocupe. Si cambia de parecer, ya sabe donde encontrarnos."
+    },
+    "deposit": {
+        "text": "Por favor, envie su deposito de $DAG a:\r\n\r\n<b>{{wallet_address}}</b>\r\n\r\nEsta dirección es únicamente suya y todo $DAG enviado a ella será acreditado en su billetera de DAG Tip Bot."
+    },
+    "withdrawal": {
+        "text": "Cuanto $DAG desea retirar? Por favor, ingrese la cantidad.",
+        "destination_text": "Por favor, ingrese la dirección a la que le gustaría retirar los fondos. Asegúrese de que sea una dirección donde usted posea las llave privada y no la dirección de un exchange.",
+        "invalid_amount": "La cantidad ingresada no es válida, por favor revísela y vuelva a intentar.",
+        "insufficient_balance": "No tiene suficiente $DAG en su billetera. Para depositar $DAG, haga click en depositar.",
+        "invalid_destination": "La dirección <b>{{destination}}</b>, <b>no es una dirección DAG válida</b>! Por favor, revísela y vuelva a ingresar una dirección de destino válida.",
+        "own_wallet": "Ha ingresado la dirección de su propia billetera <b>{{destination}}</b>, por favor ingrese una dirección de destino válida.",
+        "confirm_text": "Por favor, confirme el retiro.\r\nCantidad a retirar: <b>{{amount}} DAG</b> hacia <b>{{destination}}</b>, está seguro?",
+        "completed": "Transferencia enviada!",
+        "post_completed": "Puede seguir su transacción en https://www.dagexplorer.io/search/?term={{hash}}",
+        "canceled": "Has cancelado la transferencia.",
+        "post_cancel": "No se ha realizado ningun retiro de su billetera.",
+        "error": "Algo salió mal con su transferencia, ninguna acción ha sido procesada."
+    },
+    "tip": {
+        "confirm_text": "Por favor, confirme la transferencia.\r\nCantidad a transferir: <b>{{amount}} DAG</b> hacia <b>{{destination}}</b>, está seguro?",
+        "invalid_format": "Formato inválido para el comando /tip. El formato es <b>/tip @username cantidad</b>. Por ejemplo: <b>/tip @BotFather 111.23456789</b>",
+        "invalid_amount": "La cantidad ingresada no es válida, por favor revísela y vuelva a intentar.",
+        "insufficient_balance": "No tiene suficiente $DAG en su billetera. Para depositar $DAG, haga click en depositar.",
+        "invalid_target_user": "El usuario al que intenta enviarle una propina no poseé una billetera de DAG Tip Bot configurada. Puede reenviarle la propina una vez que configure su billetera.",
+        "target_user_setup": "{{recipient}} - Alguien ha intentado enviarle una propina de $DAG, pero usted no tiene una billetera configurada. Diríjase a https://t.me/DAGTipBot e ingrese /start para realizar la configuración.",
+        "completed": "Transferencia enviada! Puede seguir su transacción en https://www.dagexplorer.io/search/?term={{hash}}",
+        "completed_public": "{{sender}} ha enviado {{amount}} $DAG a {{recipient}}",
+        "canceled": "Has cancelado la transferencia."
+    },
+    "keyboard": { 
+        "balance": "👛 Balance",
+        "deposit": "💰 Depositar",
+        "withdraw": "💸 Retirar",
+        "help": "🆘 Ayuda"
+    }
+}
