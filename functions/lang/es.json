@@ -27,7 +27,8 @@
         "about_us": "Desarrollado por Constellation Network para su comunidad. Para aprender más acerca de Constellation Network, visite https://constellationnetwork.io\r\nSi necesita ayuda, por favor visite nuestro canal de Telegram, Stardust Support en: https://t.me/StardustSupport"
     },
     "errors": {
-        "wallet_not_found": "No pudimos encontrar su billetera, ingrese /start para configurar una."
+        "wallet_not_found": "No pudimos encontrar su billetera, ingrese /start para configurar una.",
+        "not_found": "No pude entenderlo, si necesita ayuda por favor escriba /help"
     },
     "balance": {
         "text": "<b>Su balance actual es de</b>:\r\n{{balance}} DAG"

@@ -27,7 +27,8 @@
         "about_us": "Developed by Constellation Network for its community. To learn more about Constellation Network visit https://constellationnetwork.io\r\nIf you need any help, please visit our Stardust Support Telegram channel at: https://t.me/StardustSupport"
     },
     "errors": {
-        "wallet_not_found": "Cannot find your wallet, run /start to setup your wallet."
+        "wallet_not_found": "Cannot find your wallet, run /start to setup your wallet.",
+        "not_found": "I couldn't get you, if you need help please type /help"
     },
     "balance": {
         "text": "<b>Your current balance</b>:\r\n{{balance}} DAG"
