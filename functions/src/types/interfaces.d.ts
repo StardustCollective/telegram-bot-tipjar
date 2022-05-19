@@ -48,3 +48,10 @@ interface TelegramResponse {
     ok: boolean,
     result: string
 }
+
+interface TranslatedKeyboardStrings {
+    translatedBalance: string,
+    translatedHelp: string,
+    translatedDeposit: string,
+    translatedWithdraw: string
+}

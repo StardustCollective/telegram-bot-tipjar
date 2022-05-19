@@ -263,7 +263,10 @@ export class Webhook {
       }
 
       const state = await Database.getInstance().getState(userId);
-      if (!state) return "";
+      if (!state) return Telegram.getInstance().sendText(
+        userId, Language.getString(userLanguage, "errors.not_found"),
+        Language.getKeyboard(userLanguage, this.INLINE_KEYBOARD)
+      );
 
       if (state.path === "withdrawal") {
         const withdrawalState = state as WithdrawalState;
@@ -324,7 +327,10 @@ export class Webhook {
         }
       }
 
-      return "";
+      return Telegram.getInstance().sendText(
+        userId, Language.getString(userLanguage, "errors.not_found"),
+        Language.getKeyboard(userLanguage, this.INLINE_KEYBOARD)
+      );
     }
 
     /**
