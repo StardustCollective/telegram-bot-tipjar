@@ -61,7 +61,7 @@
         "invalid_amount": "La cantidad ingresada no es válida, por favor revísela y vuelva a intentar.",
         "insufficient_balance": "No tiene suficiente $DAG en su billetera. Para depositar $DAG, haga click en depositar.",
         "invalid_target_user": "El usuario al que intenta enviarle una propina no poseé una billetera de DAG Tip Bot configurada. Puede reenviarle la propina una vez que configure su billetera.",
-        "target_user_setup": "{{recipient}} - Alguien ha intentado enviarle una propina de $DAG, pero usted no tiene una billetera configurada. Diríjase a https://t.me/DAGTipBot e ingrese /start para realizar la configuración.",
+        "target_user_setup": "{{recipient}} - Alguien ha intentado enviarle una propina de $DAG pero no tiene una billetera configurada. Diríjase a https://t.me/DAGTipBot e ingrese /start para realizar la configuración.",
         "completed": "Transferencia enviada! Puede seguir su transacción en https://www.dagexplorer.io/search/?term={{hash}}",
         "completed_public": "{{sender}} ha enviado {{amount}} $DAG a {{recipient}}",
         "canceled": "Has cancelado la transferencia."
@@ -71,5 +71,11 @@
         "deposit": "💰 Depositar",
         "withdraw": "💸 Retirar",
         "help": "🆘 Ayuda"
+    },
+    "language": {
+        "not_admin": "No puede cambiar el lenguaje ya que no es administrador o creador del grupo.",
+        "invalid_language": "Idioma invalido. Idiomas disponibles: {{available_languages}}",
+        "successful": "Mi idioma para este grupo a cambiado!. A partir de ahora hablaré en español",
+        "invalid_format": "Formato inválido para el comando /setlanguage. El formato es <b>/setlanguage codigo_idioma</b>. Por ejemplo: <b>/setlanguage es</b>"
     }
 }
