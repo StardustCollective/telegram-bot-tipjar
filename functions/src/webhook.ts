@@ -3,12 +3,14 @@ import {Database} from "./database";
 import {DBUser} from "./user";
 import {Language} from "./language";
 import {Telegram} from "./telegram";
+import {readdirSync} from "fs";
 
 /**
  * Class for handling all webhook calls.
  */
 export class Webhook {
     INLINE_KEYBOARD = false;
+    LANGUAGES_FOLDER_PATH = './lang/';
     /**
      * Handle the /start command.
      * @param {string} userId - telegram user id
@@ -137,7 +139,8 @@ export class Webhook {
         targetUsername: string,
         amount: number,
         chatId: string,
-        userLanguage: string
+        userLanguage: string,
+        groupLanguage: string
     ) : Promise<string> {
       if (!user || !user.wallet) return "";
 
@@ -150,7 +153,7 @@ export class Webhook {
 
         await Telegram.getInstance().sendText(
             chatId,
-            Language.getString(userLanguage, "tip.target_user_setup", targetUserData)
+            Language.getString(groupLanguage, "tip.target_user_setup", targetUserData)
         );
 
         return Telegram.getInstance().sendText(
@@ -215,6 +218,56 @@ export class Webhook {
     }
 
     /**
+     *
+     * @param {ChatMember} chatMember member of a chat 
+     * @return {boolean} true if the user is Admin or Creator
+     */
+    _userIsAdmin(chatMember: ChatMember): boolean {
+      return chatMember.status ? chatMember.status === "administrator" || chatMember.status === "creator" : false;
+    }
+
+    _getAvailableLanguagesFromFiles() {
+      return readdirSync(this.LANGUAGES_FOLDER_PATH).map((file: string) => file.split(".")[0]);
+    }
+
+    /**
+     * @param {string} userId - telegram user id
+     * @param {string} chatId - group chat id
+     * @return {Promise}
+     */
+    async handleSetLanguage(
+      userId: string,
+      chatId: string,
+      targetLanguage: string,
+      groupLanguage: string
+    ) : Promise<string> {
+      if (!userId || !chatId) return "";
+
+      const chatMember = await Telegram.getInstance().getGroupMemberData(chatId, userId);
+
+      if (!chatMember || !this._userIsAdmin(chatMember)) {
+        return Telegram.getInstance().sendText(
+            chatId,
+            Language.getString(groupLanguage, "language.not_admin"),
+        );
+      }
+
+      const availableLanguages = this._getAvailableLanguagesFromFiles();
+
+      if(!availableLanguages.includes(targetLanguage)){
+        const tokens = new Map();
+        tokens.set("available_languages", availableLanguages);
+        return Telegram.getInstance().sendText(
+          chatId, Language.getString(groupLanguage, "language.invalid_language", tokens));
+      }
+
+      await Database.getInstance().saveGroupLanguage(chatId, targetLanguage);
+      return Telegram.getInstance().sendText(
+        chatId,
+        Language.getString(targetLanguage, "language.successful"))
+      }
+
+    /**
      * Handles default input, for now mainly withdrawal flow,
      * could be expanded to more later.
      * @param {string} userId the telegram user id
@@ -224,15 +277,26 @@ export class Webhook {
      */
     async handleDefault(
         userId: string,
+        command: string,
         input: string,
         chatId: string,
-        userLanguage: string
+        userLanguage: string,
+        groupLanguage: string
     ) : Promise<string> {
       const user = await this.checkUser(userId, userLanguage);
       if (!user || !user.wallet) return "";
 
-      const [cmd, targetUsername, amount] = input?.split(" ");
-      if (cmd === "/tip") {
+      if(input.startsWith("/setlanguage")){
+        const [_, targetLanguage] = input?.split(" ");
+        if(!targetLanguage){
+          return Telegram.getInstance().sendText(
+            chatId, Language.getString(groupLanguage, "language.invalid_format"));
+        }
+        return this.handleSetLanguage(userId, chatId, targetLanguage, groupLanguage);
+      }
+
+      if (command.startsWith("/tip")) {
+        const [_, targetUsername, amount] = input?.split(" ");
         await Database.getInstance().clearState(userId);
         if (!targetUsername || !targetUsername.startsWith("@") || !amount) {
           return Telegram.getInstance().sendText(
@@ -258,7 +322,8 @@ export class Webhook {
             targetUsername,
             transferAmount,
             chatId,
-            userLanguage
+            userLanguage,
+            groupLanguage
         );
       }
 
@@ -365,10 +430,10 @@ export class Webhook {
      * @param {string} chatId
      * @param {string} messageId
      * @param {string} data
-     * @return {Prromise}
+     * @return {Promise}
      */
     async handleCallbackQuery(
-        userId: string, chatId: string, messageId: string, data: string, userLanguage: string
+        userId: string, chatId: string, messageId: string, data: string, userLanguage: string, groupLanguage: string
     ) : Promise<string> {
       data = data.replace("buttons.", "");
       const section = data.slice(0, data.indexOf("."));
@@ -404,10 +469,11 @@ export class Webhook {
           completedPublicParams.set("recipient", state.destinationUser);
           completedPublicParams.set("amount", state.amount);
 
+          const sourceGroupLanguage = await Database.getInstance().getGroupLanguage(state.sourceChatId);
           await Telegram.getInstance().sendText(
               state.sourceChatId,
               Language.getString(
-                userLanguage,
+                sourceGroupLanguage,
                   "tip.completed_public",
                   completedPublicParams
               )
@@ -417,12 +483,12 @@ export class Webhook {
           tokens.set("hash", transferHash);
           return Telegram.getInstance().editMessage(
               chatId, messageId,
-              Language.getString(userLanguage, "tip.completed", tokens)
+              Language.getString(groupLanguage, "tip.completed", tokens)
           );
         } else {
           return Telegram.getInstance().editMessage(
               chatId, messageId,
-              Language.getString(userLanguage, "tip.canceled")
+              Language.getString(groupLanguage, "tip.canceled")
           );
         }
       }
@@ -455,8 +521,7 @@ export class Webhook {
           );
           return Telegram.getInstance().sendText(
               chatId,
-              Language.getString(userLanguage, "withdrawal.post_completed", tokens),
-              Language.getKeyboard(userLanguage, this.INLINE_KEYBOARD)
+              Language.getString(userLanguage, "withdrawal.post_completed", tokens)
           );
         } else {
           await Telegram.getInstance().editMessage(
@@ -465,8 +530,7 @@ export class Webhook {
           );
           return Telegram.getInstance().sendText(
               chatId,
-              Language.getString(userLanguage, "withdrawal.post_cancel"),
-              Language.getKeyboard(userLanguage, this.INLINE_KEYBOARD)
+              Language.getString(userLanguage, "withdrawal.post_cancel")
           );
         }
       }

@@ -79,12 +79,12 @@ export class Language {
 
     /**
      *
-     * @param {string} userLanguage the language to pick
+     * @param {string} language the language to pick
      * @param {boolean} inline should the keyboard be integrated with the message
      * @return {TelegramKeyboard} the keyboard to use in telegram
      */
     getKeyboard(
-      userLanguage: string,
+      language: string,
       inline: boolean
   ) : TelegramKeyboard {
     const {
@@ -92,7 +92,7 @@ export class Language {
       translatedHelp, 
       translatedDeposit, 
       translatedWithdraw
-    }: TranslatedKeyboardStrings = currentInstance.getKeyboardTranslatedStrings(userLanguage);
+    }: TranslatedKeyboardStrings = currentInstance.getKeyboardTranslatedStrings(language);
 
     const keyboard: TelegramKeyboard = {inline: inline, keys: [
       [{text: translatedDeposit}, {text: translatedWithdraw}],
@@ -104,26 +104,26 @@ export class Language {
 
     /**
      *
-     * @param {string} userLanguage the language to pick
-     * @return {TelegramKeyboard} the keyboard to use in telegram
+     * @param {string} language the language to pick
+     * @return {TranslatedKeyboardStrings} the keyboard to use in telegram
      */
-  getKeyboardTranslatedStrings(userLanguage: string): TranslatedKeyboardStrings{
-    const translatedBalance = currentInstance.reduceString(userLanguage, "keyboard.balance");
-    const translatedHelp = currentInstance.reduceString(userLanguage, "keyboard.help");
-    const translatedDeposit = currentInstance.reduceString(userLanguage, "keyboard.deposit");
-    const translatedWithdraw = currentInstance.reduceString(userLanguage, "keyboard.withdraw");
+  getKeyboardTranslatedStrings(language: string): TranslatedKeyboardStrings{
+    const translatedBalance = currentInstance.reduceString(language, "keyboard.balance");
+    const translatedHelp = currentInstance.reduceString(language, "keyboard.help");
+    const translatedDeposit = currentInstance.reduceString(language, "keyboard.deposit");
+    const translatedWithdraw = currentInstance.reduceString(language, "keyboard.withdraw");
 
     return {translatedBalance, translatedHelp, translatedDeposit, translatedWithdraw};
   }
 
   /**
      *
-     * @param {string} userLanguage the language to pick
+     * @param {string} language the language to pick
      * @param {string} path should the keyboard be integrated with the message
      * @return {any} translated string
      */
-  reduceString(userLanguage: string, path: string){
-    const translations = this.translations[userLanguage] ?? this.translations[DEFAULT_LANGUAGE];
+  reduceString(language: string, path: string){
+    const translations = this.translations[language] ?? this.translations[DEFAULT_LANGUAGE];
     const translated = path.split(".").reduce(
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (currentObject :any, property :string) =>
