@@ -75,7 +75,7 @@
     "language": {
         "not_admin": "You can't change the language since you're not admin or creator of the group.",
         "invalid_language": "Invalid language selection. Supported languages: {{available_languages}}",
-        "successful": "Language for this group has been changed! From now on, I'm speaking English.",
+        "successful": "Language for this group has been changed to English.",
         "invalid_format": "Invalid format for the /setlanguage command. The format is <b>/setlanguage language_code</b>. So for example <b>/setlanguage en</b>"
     }
 }

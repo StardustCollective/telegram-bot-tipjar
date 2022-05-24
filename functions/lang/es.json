@@ -75,7 +75,7 @@
     "language": {
         "not_admin": "No puede cambiar el lenguaje ya que no es administrador o creador del grupo.",
         "invalid_language": "Idioma invalido. Idiomas disponibles: {{available_languages}}",
-        "successful": "Mi idioma para este grupo a cambiado!. A partir de ahora hablaré en español",
+        "successful": "Mi idioma para este grupo a cambiado a Español",
         "invalid_format": "Formato inválido para el comando /setlanguage. El formato es <b>/setlanguage codigo_idioma</b>. Por ejemplo: <b>/setlanguage es</b>"
     }
 }
