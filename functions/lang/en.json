@@ -27,7 +27,8 @@
         "about_us": "Developed by Constellation Network for its community. To learn more about Constellation Network visit https://constellationnetwork.io\r\nIf you need any help, please visit our Stardust Support Telegram channel at: https://t.me/StardustSupport"
     },
     "errors": {
-        "wallet_not_found": "Cannot find your wallet, run /start to setup your wallet."
+        "wallet_not_found": "Cannot find your wallet, run /start to setup your wallet.",
+        "not_found": "I couldn't get you, if you need help please type /help"
     },
     "balance": {
         "text": "<b>Your current balance</b>:\r\n{{balance}} DAG"
@@ -64,5 +65,17 @@
         "completed": "Transfer sent! You can follow your transaction on https://www.dagexplorer.io/search/?term={{hash}}",
         "completed_public": "{{sender}} tipped {{recipient}} {{amount}} DAG",
         "canceled": "You canceled the transfer."
+    },
+    "keyboard": { 
+        "balance": "👛 Balance",
+        "deposit": "💰 Deposit",
+        "withdraw": "💸 Withdraw",
+        "help": "🆘 Help"
+    },
+    "language": {
+        "not_admin": "You can't change the language since you're not admin or creator of the group.",
+        "invalid_language": "Invalid language selection. Supported languages: {{available_languages}}",
+        "successful": "Language for this group has been changed to English.",
+        "invalid_format": "Invalid format for the /setlanguage command. The format is <b>/setlanguage language_code</b>. So for example <b>/setlanguage en</b>"
     }
 }

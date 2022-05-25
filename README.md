@@ -7,7 +7,7 @@ Inside functions folder;
 `ngrok http 7001` to setup a tunnel to local firebase emulator.
 
 Set TG webhook URL e.g.;
-- `curl -F "url=https://<NGROK-URL>.ngrok.io/<firebase-url>/telegram/RANDOM-API-KEY" https://api.telegram.org/<botID>:<TOKEN>/setWebhook`
+- `curl -F "url=https://<NGROK-URL>.ngrok.io/<firebase-url>/telegram/RANDOM-API-KEY" https://api.telegram.org/bot<botID>:<TOKEN>/setWebhook`
 
 The `RANDOM-API-KEY` is an API key that you choose yourself and set on the Firebase Config (see below).
 

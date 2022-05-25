@@ -81,6 +81,28 @@ export class Database {
   }
 
   /**
+  * Saves new language to be used as default for groupId to DB.
+  * @param {string} groupId - telegram group id
+  * @param {string} language - group language to use
+  * @return {Promise}
+  */
+  saveGroupLanguage(groupId: string, language: string): Promise<string> {
+    const dbLanguage: DbLanguage = {language};
+    return fb.database().ref(`groups/${groupId}`).set(dbLanguage);
+  }
+
+  /**
+  * Saves new language to be used as default for groupId to DB.
+  * @param {string} groupId - telegram group id
+  * @return {string} - Language set for the groupId
+  */
+  async getGroupLanguage(groupId: string): Promise<string> {
+    const snapshot = await fb.database().ref(`groups/${groupId}`).once("value", (language) => language);
+    const language: DbLanguage = snapshot.val();
+    return language ? language.language: "en";
+  }
+
+  /**
    *
    * @param {string} userID - telegram user id
    * @param {string} path - telegram user id
