@@ -137,15 +137,17 @@ export class Telegram {
      */
     getGroupMemberData(groupChatId: string, userId: string)
       : Promise<ChatMember> {
-    const payload = {
-      "chat_id": groupChatId,
-      "user_id": userId
-    };
+      const payload = {
+        "chat_id": groupChatId,
+        "user_id": userId,
+      };
 
-    const chatMember: Promise<ChatMember> = this.callAPI("getChatMember", "post",
-    JSON.stringify(payload)
-) as any;
+      const chatMember: Promise<ChatMember> = this.callAPI(
+          "getChatMember",
+          "post",
+          JSON.stringify(payload)
+      ) as any;
 
-    return chatMember;
-  }
+      return chatMember;
+    }
 }

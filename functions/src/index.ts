@@ -36,8 +36,8 @@ exports.telegram = functions
 
       console.log("telegram webhook req.body: ", JSON.stringify(req.body));
 
-      //When the bot gets added to a group it can get stuck for some time without this.
-      if(req.body.message && !req.body.message.text){
+      // When the bot gets added to a group it can get stuck without this.
+      if (req.body.message && !req.body.message.text) {
         console.log("No text, return");
         return res.status(200).send();
       }
@@ -50,7 +50,8 @@ exports.telegram = functions
         // Handle callback queries, these come from inline commands.
         if (req.body.callback_query) {
           try {
-            const groupLanguage = await Database.getInstance().getGroupLanguage(req.body.callback_query.message.chat.id);
+            const groupLanguage = await Database.getInstance()
+                .getGroupLanguage(req.body.callback_query.message.chat.id);
             await webhook.handleCallbackQuery(
                 req.body.callback_query.from.id,
                 req.body.callback_query.message.chat.id,
@@ -75,24 +76,26 @@ exports.telegram = functions
         const tgUserLanguage = req.body.message.from.language_code;
         const chatType = req.body.message.chat?.type;
 
-        const groupLanguage = await Database.getInstance().getGroupLanguage(chatId);
+        const groupLanguage = await Database.getInstance()
+            .getGroupLanguage(chatId);
 
         console.log("chatID: ", chatId);
 
         const {
-          translatedBalance, 
-          translatedHelp, 
-          translatedDeposit, 
-          translatedWithdraw
-        } = Language.getKeyboardStrings(chatType === "supergroup" ? groupLanguage : tgUserLanguage);
-
-        if(messageText){
+          translatedBalance,
+          translatedHelp,
+          translatedDeposit,
+          translatedWithdraw,
+        } = Language.getKeyboardStrings(chatType === "supergroup" ?
+            groupLanguage : tgUserLanguage);
+        if (messageText) {
           // The commands are sent by 'text',
           // so parse them and start the chosen flow.
           const command = messageText.split("@");
-          switch(command[0]) {
+          switch (command[0]) {
             case "/start":
-              await webhook.handleStart(tgUserId, tgUsername, tgUserLanguage); break;
+              await webhook.handleStart(tgUserId, tgUsername, tgUserLanguage);
+              break;
             case "/balance":
             case translatedBalance:
               await webhook.handleBalance(tgUserId, tgUserLanguage); break;
@@ -108,7 +111,14 @@ exports.telegram = functions
             case "/disclaimer":
               await webhook.handleDisclaimer(tgUserId, tgUserLanguage); break;
             default:
-              await webhook.handleDefault(tgUserId, command[0], messageText, chatId, tgUserLanguage, groupLanguage); break;
+              await webhook.handleDefault(
+                  tgUserId,
+                  command[0],
+                  messageText,
+                  chatId,
+                  tgUserLanguage,
+                  groupLanguage);
+              break;
           }
         }
 

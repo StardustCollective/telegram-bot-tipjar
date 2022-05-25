@@ -50,25 +50,25 @@ interface TelegramResponse {
 interface ChatMemberOwner {
     status: "creator";
     user: any;
-    is_anonymous: boolean;
-    custom_title?: string;
+    isAnonymous: boolean;
+    customTitle?: string;
 }
 interface ChatMemberAdministrator {
     status: "administrator";
     user: any;
-    is_anonymous: boolean;
-    custom_title?: string;
-    can_be_edited: boolean;
-    can_change_info: boolean;
-    can_post_messages: boolean;
-    can_edit_messages: boolean;
-    can_delete_messages: boolean;
-    can_invite_users: boolean;
-    can_restrict_members: boolean;
-    can_pin_messages: boolean;
-    can_promote_members: boolean;
-    can_manage_voice_chats: boolean;
-    can_manage_chat: boolean;
+    isAnonymous: boolean;
+    customTitle?: string;
+    canBeEdited: boolean;
+    canChangeInfo: boolean;
+    canPostMessages: boolean;
+    canEditMessages: boolean;
+    canDeleteMessages: boolean;
+    canInviteUsers: boolean;
+    canRestrictMembers: boolean;
+    canPinMessages: boolean;
+    canPromoteMembers: boolean;
+    canManageVoiceChats: boolean;
+    canManageChat: boolean;
 }
 interface ChatMemberMember {
     status: "member";
@@ -77,16 +77,16 @@ interface ChatMemberMember {
 interface ChatMemberRestricted {
     status: "restricted";
     user: any;
-    until_date: number;
-    is_member: boolean;
-    can_change_info: boolean;
-    can_send_messages: boolean;
-    can_send_media_messages: boolean;
-    can_invite_users: boolean;
-    can_pin_messages: boolean;
-    can_send_polls: boolean;
-    can_send_other_messages: boolean;
-    can_add_web_page_previews: boolean;
+    untilDate: number;
+    isMember: boolean;
+    canChangeInfo: boolean;
+    canSendMessages: boolean;
+    canSendMediaMssages: boolean;
+    canInviteUsers: boolean;
+    canPinMessages: boolean;
+    canSendPolls: boolean;
+    canSendOtherMessages: boolean;
+    canAddWebPagePreviews: boolean;
 }
 interface ChatMemberLeft {
     status: "left";
@@ -95,10 +95,15 @@ interface ChatMemberLeft {
 interface ChatMemberBanned {
     status: "kicked";
     user: any;
-    until_date: number;
+    untilDate: number;
 }
 
-type ChatMember = ChatMemberAdministrator | ChatMemberOwner | ChatMemberMember | ChatMemberRestricted | ChatMemberLeft | ChatMemberBanned;
+type ChatMember = ChatMemberAdministrator |
+        ChatMemberOwner |
+        ChatMemberMember |
+        ChatMemberRestricted |
+        ChatMemberLeft |
+        ChatMemberBanned;
 
 interface TranslatedKeyboardStrings {
     translatedBalance: string,
