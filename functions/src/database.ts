@@ -97,7 +97,8 @@ export class Database {
   * @return {string} - Language set for the groupId
   */
   async getGroupLanguage(groupId: string): Promise<string> {
-    const snapshot = await fb.database().ref(`groups/${groupId}`).once("value", (language) => language);
+    const snapshot = await fb.database().ref(`groups/${groupId}`)
+        .once("value", (language) => language);
     const language: DbLanguage = snapshot.val();
     return language ? language.language: "en";
   }
