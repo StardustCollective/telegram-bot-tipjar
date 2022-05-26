@@ -24,6 +24,9 @@ export class Webhook {
         userLanguage: string) : Promise<string> {
       let user = await Database.getInstance().getUser(userId);
       if (!user) {
+        if (!username) {
+          return ""; // cannot create user w/no username
+        }
         user = await Database.getInstance().createUser(userId, username);
       }
       // Always keep username up to date in DB.
@@ -320,7 +323,7 @@ export class Webhook {
         groupLanguage: string
     ) : Promise<string> {
       if (input.startsWith("/setlanguage")) {
-        const [_, targetLanguage] = input?.split(" ");
+        const [_, targetLanguage] = (input || "").split(" ");
         if (!targetLanguage) {
           return Telegram.getInstance().sendText(
               chatId,
@@ -338,7 +341,7 @@ export class Webhook {
       if (!user || !user.wallet) return "";
 
       if (command.startsWith("/tip")) {
-        const [_, targetUsername, amount] = input?.split(" ");
+        const [_, targetUsername, amount] = (input || "").split(" ");
         await Database.getInstance().clearState(userId);
         if (!targetUsername || !targetUsername.startsWith("@") || !amount) {
           return Telegram.getInstance().sendText(

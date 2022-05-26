@@ -45,7 +45,8 @@ interface TelegramKeyboard {
 
 interface TelegramResponse {
     ok: boolean,
-    result: string
+    result: string,
+    description?: string
 }
 interface ChatMemberOwner {
     status: "creator";
