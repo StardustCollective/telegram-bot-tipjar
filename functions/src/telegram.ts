@@ -48,7 +48,14 @@ export class Telegram {
 
       const result = await response.json() as TelegramResponse;
       if (!result.ok) {
-        console.error(result);
+        console.error(`callAPI err: ${JSON.stringify(result)}`);
+
+        // Don't throw on blocked errors, user is unable to continue anyways
+        if (result.description?.includes("bot was blocked by the user") ||
+          result.description?.includes("bot can't initiate conversation")) {
+          return "";
+        }
+
         throw new Error("not ok");
       }
       return result.result;
@@ -64,7 +71,7 @@ export class Telegram {
      * to provide options in the chat.
      * @return {Promise}
      */
-    sendText(
+    async sendText(
         chatId: string,
         text: string,
         keyboard?: TelegramKeyboard,
