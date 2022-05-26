@@ -52,7 +52,8 @@ export class Telegram {
 
         // Don't throw on blocked errors, user is unable to continue anyways
         if (result.description?.includes("bot was blocked by the user") ||
-          result.description?.includes("bot can't initiate conversation")) {
+          result.description?.includes("bot can't initiate conversation") ||
+          result.description?.includes("Forbidden")) {
           return "";
         }
 
