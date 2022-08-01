@@ -1,5 +1,4 @@
 import {dag4} from "@stardust-collective/dag4";
-import fetch from "node-fetch";
 
 let currentInstance: Constellation;
 
@@ -12,7 +11,7 @@ export class Constellation {
    * @constructor
    */
   constructor() {
-    dag4.di.useFetchHttpClient(fetch);
+    dag4.account.connect({networkVersion: "1.0", testnet: false});
   }
 
   /**
