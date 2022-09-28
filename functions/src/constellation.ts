@@ -11,7 +11,7 @@ export class Constellation {
    * @constructor
    */
   constructor() {
-    dag4.account.connect({networkVersion: "1.0", testnet: false});
+    dag4.account.connect({networkVersion: "2.0", testnet: false});
   }
 
   /**
