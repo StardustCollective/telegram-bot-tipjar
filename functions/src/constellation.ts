@@ -11,7 +11,11 @@ export class Constellation {
    * @constructor
    */
   constructor() {
-    dag4.account.connect({networkVersion: "2.0", testnet: false});
+    dag4.account.connect({networkVersion: "2.0", testnet: false,
+      beUrl: "https://be-mainnet.constellationnetwork.io",
+      l0Url: "https://l0-lb-mainnet.constellationnetwork.io",
+      l1Url: "https://l1-lb-mainnet.constellationnetwork.io",
+    });
   }
 
   /**
